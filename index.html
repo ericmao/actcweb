@@ -8,6 +8,8 @@
     <link rel="apple-touch-icon" href="assets/icons/favicon.ico">
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -70,7 +72,7 @@
                 <div class="flex items-center space-x-3">
                     <!-- JPG Logo for Navigation -->
                     <div class="w-10 h-10">
-                        <img src="public/assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full">
+                        <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full">
                     </div>
                     <span class="text-xl font-bold text-gray-800">ACTC</span>
                 </div>
@@ -78,7 +80,7 @@
                     <a href="#home" class="text-gray-600 hover:text-actc-orange transition-colors">首頁</a>
                     <a href="about.html" class="text-gray-600 hover:text-actc-orange transition-colors">關於協會</a>
                     <a href="#news" class="text-gray-600 hover:text-actc-orange transition-colors">最新消息</a>
-                    <a href="#courses" class="text-gray-600 hover:text-actc-orange transition-colors">活動課程</a>
+                    <a href="#events" class="text-gray-600 hover:text-actc-orange transition-colors">活動課程</a>
                     <a href="workgroups.html" class="text-gray-600 hover:text-actc-orange transition-colors">工作小組</a>
                 </div>
                 <div class="md:hidden">
@@ -99,7 +101,7 @@
             <div class="mb-8">
                 <!-- JPG Logo - 使用您的設計 -->
                 <div class="w-64 h-64 mx-auto">
-                    <img src="public/assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain">
+                    <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain">
                 </div>
             </div>
             <h1 class="text-4xl md:text-6xl font-bold mb-6">ACTC</h1>
@@ -110,9 +112,57 @@
         </div>
     </section>
 
+    <!-- 協會宗旨 -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">協會宗旨</h2>
+                <div class="w-24 h-1 bg-actc-orange mx-auto"></div>
+            </div>
+            
+            <!-- 協會性質與立案資訊 -->
+            <div class="bg-gradient-to-r from-actc-orange to-actc-orange-dark text-white rounded-lg p-8 mb-12 text-center">
+                <p class="text-lg leading-relaxed mb-4">
+                    本會為依法設立、非以營利為目的之公益性社會團體，以推動國際資訊安全人才培育之生態系良好發展為宗旨。
+                </p>
+                <div class="text-sm text-white/90 space-y-1">
+                    <p>成立日期：112/2/17</p>
+                    <p>立案編號：1120022057</p>
+                </div>
+            </div>
 
-
-
+            <!-- 宗旨目標 -->
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-actc-orange rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">推廣資訊安全教育</h3>
+                    <p class="text-gray-600">透過各種管道推廣資訊安全知識，提升社會大眾的資安意識</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-actc-orange rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">培養專業人才</h3>
+                    <p class="text-gray-600">建立完善的人才培育體系，為產業提供優秀的資安專業人員</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-actc-orange rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">國際交流合作</h3>
+                    <p class="text-gray-600">促進國際間的資安技術交流，建立良好的合作關係</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- 最新消息 -->
     <section id="news" class="py-20 bg-white">
@@ -159,137 +209,45 @@
     </section>
 
     <!-- 活動課程列表 -->
-    <section id="courses" class="py-20 bg-gray-50">
+    <section id="events" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">活動課程</h2>
                 <div class="w-24 h-1 bg-actc-orange mx-auto"></div>
             </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="h-48 bg-gradient-to-br from-actc-orange to-actc-orange-dark flex items-center justify-center">
-                        <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                        </svg>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-3">資訊安全認證培訓</h3>
-                        <p class="text-gray-600 mb-4">為期8週的專業認證課程，涵蓋網路安全、密碼學、風險管理等核心領域。</p>
-                        <div class="flex items-center text-sm text-gray-500">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            <span>2025-08-15 開課</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span>台北市信義區</span>
-                        </div>
-                    </div>
+            
+            <!-- 載入中狀態 -->
+            <div id="events-loading" class="text-center py-12">
+                <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-actc-orange">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-actc-orange" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    載入活動課程中...
                 </div>
+            </div>
 
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="h-48 bg-gradient-to-br from-actc-orange to-actc-orange-dark flex items-center justify-center">
-                        <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-3">駭客馬拉松競賽</h3>
-                        <p class="text-gray-600 mb-4">24小時不間斷的資安競賽，挑戰參賽者的技術能力與創新思維。</p>
-                        <div class="flex items-center text-sm text-gray-500">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            <span>2025-09-20 開始</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span>新北市板橋區</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- 空狀態 -->
+            <div id="events-empty" class="hidden text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">暫無活動課程</h3>
+                <p class="mt-1 text-sm text-gray-500">目前沒有活動課程安排</p>
+            </div>
 
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="h-48 bg-gradient-to-br from-actc-orange to-actc-orange-dark flex items-center justify-center">
-                        <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                        </svg>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-3">資安研討會</h3>
-                        <p class="text-gray-600 mb-4">邀請國內外資安專家分享最新趨勢與技術，促進產業交流與合作。</p>
-                        <div class="flex items-center text-sm text-gray-500">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            <span>2025-10-15 舉行</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span>台中市西區</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- 錯誤狀態 -->
+            <div id="events-error" class="hidden text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">載入失敗</h3>
+                <p class="mt-1 text-sm text-gray-500">無法載入活動課程，請稍後再試</p>
+            </div>
 
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="h-48 bg-gradient-to-br from-actc-orange to-actc-orange-dark flex items-center justify-center">
-                        <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-3">資安實務工作坊</h3>
-                        <p class="text-gray-600 mb-4">實作導向的資安技能培訓，讓學員在真實環境中學習防護技術。</p>
-                        <div class="flex items-center text-sm text-gray-500">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            <span>2025-11-10 開課</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span>高雄市前金區</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="h-48 bg-gradient-to-br from-actc-orange to-actc-orange-dark flex items-center justify-center">
-                        <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-3">資安人才媒合會</h3>
-                        <p class="text-gray-600 mb-4">企業與資安人才的直接交流平台，促進就業機會與產業發展。</p>
-                        <div class="flex items-center text-sm text-gray-500">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            <span>2025-12-05 舉行</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span>台北市大安區</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- 活動容器 -->
+            <div id="events-container" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 動態載入的活動內容 -->
             </div>
         </div>
     </section>
@@ -302,8 +260,8 @@
                     <div class="flex items-center space-x-3 mb-4">
                         <!-- JPG Logo for Footer -->
                         <div class="w-10 h-10">
-                            <img src="public/assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full">
-                </div>
+                            <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full">
+                        </div>
                         <span class="text-xl font-bold">ACTC</span>
                     </div>
                     <p class="text-gray-300 mb-4">國際資訊安全人才培育與推廣協會</p>
@@ -315,7 +273,7 @@
                         <p>電話：(02) 2345-6789</p>
                         <p>傳真：(02) 2345-6790</p>
                         <p>信箱：info@actc.org.tw</p>
-                        <p>地址：台北市信義區信義路五段7號</p>
+                        <p>地址：105台北市松山區復興北路57號</p>
                     </div>
                 </div>
                 <div>
@@ -323,7 +281,7 @@
                     <div class="space-y-2">
                         <a href="about.html" class="block text-gray-300 hover:text-actc-orange transition-colors">關於協會</a>
                         <a href="#news" class="block text-gray-300 hover:text-actc-orange transition-colors">最新消息</a>
-                        <a href="#courses" class="block text-gray-300 hover:text-actc-orange transition-colors">活動課程</a>
+                        <a href="#events" class="block text-gray-300 hover:text-actc-orange transition-colors">活動課程</a>
                         <a href="workgroups.html" class="block text-gray-300 hover:text-actc-orange transition-colors">工作小組</a>
                     </div>
                 </div>
@@ -499,6 +457,135 @@
         // 初始化新聞管理
         document.addEventListener('DOMContentLoaded', () => {
             new NewsManager();
+        });
+    </script>
+
+    <!-- 活動管理 JavaScript -->
+    <script>
+        // 活動管理
+        class EventsManager {
+            constructor() {
+                this.eventsContainer = document.getElementById('events-container');
+                this.eventsLoading = document.getElementById('events-loading');
+                this.eventsEmpty = document.getElementById('events-empty');
+                this.eventsError = document.getElementById('events-error');
+                this.init();
+            }
+
+            async init() {
+                await this.loadEvents();
+            }
+
+            async loadEvents() {
+                try {
+                    const response = await fetch('http://localhost:5001/api/events');
+                    if (!response.ok) throw new Error('Failed to fetch events');
+                    
+                    const events = await response.json();
+                    this.displayEvents(events);
+                } catch (error) {
+                    console.error('Error loading events:', error);
+                    this.showError();
+                }
+            }
+
+            displayEvents(events) {
+                this.eventsLoading.classList.add('hidden');
+                
+                if (!events || events.length === 0) {
+                    this.eventsEmpty.classList.remove('hidden');
+                    return;
+                }
+
+                this.eventsContainer.classList.remove('hidden');
+                this.eventsContainer.innerHTML = events.map(event => this.createEventCard(event)).join('');
+            }
+
+            createEventCard(event) {
+                const formattedDate = new Date(event.date).toLocaleDateString('zh-TW', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'short'
+                });
+
+                // 活動類型徽章樣式
+                const typeStyles = {
+                    'meetup': 'bg-blue-100 text-blue-800',
+                    'workshop': 'bg-green-100 text-green-800',
+                    'course': 'bg-purple-100 text-purple-800',
+                    'others': 'bg-gray-100 text-gray-800'
+                };
+
+                const typeLabels = {
+                    'meetup': '聚會',
+                    'workshop': '工作坊',
+                    'course': '課程',
+                    'others': '其他'
+                };
+
+                // 檢測連結類型並產生對應圖示
+                let linkIcon = '';
+                if (event.link) {
+                    const url = event.link.toLowerCase();
+                    if (url.includes('discord')) {
+                        linkIcon = '<i class="fab fa-discord text-blue-600"></i>';
+                    } else if (url.includes('teams') || url.includes('microsoft')) {
+                        linkIcon = '<i class="fab fa-microsoft text-blue-600"></i>';
+                    } else {
+                        linkIcon = '<i class="fas fa-external-link-alt text-blue-600"></i>';
+                    }
+                }
+
+                return `
+                    <div class="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow">
+                        <!-- 主題 -->
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">${event.title}</h3>
+                        
+                        <!-- 類型 -->
+                        <div class="mb-3">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeStyles[event.type] || typeStyles['others']}">
+                                ${typeLabels[event.type] || event.type}
+                            </span>
+                        </div>
+                        
+                        <!-- 簡介 -->
+                        <p class="text-gray-600 mb-4 leading-relaxed">${event.description}</p>
+                        
+                        <!-- 日期 -->
+                        <p class="text-sm text-gray-500 mb-2">
+                            <i class="fas fa-calendar-alt mr-2 text-actc-orange"></i>
+                            ${formattedDate}
+                        </p>
+                        
+                        <!-- 地點 -->
+                        <p class="text-sm text-gray-500 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2 text-actc-orange"></i>
+                            ${event.location}
+                        </p>
+                        
+                        <!-- 連結（如果存在） -->
+                        ${event.link ? `
+                            <div class="pt-3 border-t border-gray-100">
+                                <a href="${event.link}" target="_blank" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                                    ${linkIcon}
+                                    <span class="ml-2">線上連結</span>
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            showError() {
+                this.eventsLoading.classList.add('hidden');
+                this.eventsError.classList.remove('hidden');
+            }
+        }
+
+        // 初始化活動管理
+        document.addEventListener('DOMContentLoaded', () => {
+            new EventsManager();
         });
     </script>
 
