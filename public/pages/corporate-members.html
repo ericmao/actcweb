@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企業會員 - ACTC 國際資訊安全人才培育與推廣協會</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="ACTC 國際資訊安全人才培育與推廣協會企業會員，匯聚頂尖資安企業，推動產業發展">
+    <meta name="keywords" content="ACTC, 企業會員, 資訊安全, 資安企業, 產業合作">
+    <meta name="author" content="ACTC">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-424DY83DBT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-424DY83DBT');
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+        .member-card {
+            transition: all 0.3s ease;
+        }
+        
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .membership-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .membership-platinum {
+            background: linear-gradient(135deg, #c0c0c0 0%, #f0f0f0 100%);
+            color: #666;
+        }
+        
+        .membership-gold {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #8b7500;
+        }
+        
+        .membership-silver {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            color: #666;
+        }
+        
+        .membership-bronze {
+            background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%);
+            color: #ffffff;
+        }
+        
+        .filter-button.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 導航欄 -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <img src="/assets/images/actc-logo.jpg" alt="ACTC Logo" class="h-10 w-auto">
+                        <span class="ml-3 text-xl font-bold text-gray-900">ACTC</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-8">
+                    <a href="/" class="text-gray-700 hover:text-blue-600 transition-colors">首頁</a>
+                    <a href="/news" class="text-gray-700 hover:text-blue-600 transition-colors">最新消息</a>
+                    <a href="/corporate-members" class="text-blue-600 font-medium">企業會員</a>
+                    <a href="/about" class="text-gray-700 hover:text-blue-600 transition-colors">關於我們</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <main class="min-h-screen">
+        <!-- 頁面標題 -->
+        <section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">企業會員</h1>
+                <p class="text-xl md:text-2xl text-blue-100 mb-8">
+                    匯聚頂尖資安企業，共同推動產業發展
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <div class="bg-white bg-opacity-20 px-4 py-2 rounded-lg">
+                        <span id="totalMembers" class="text-2xl font-bold">-</span>
+                        <span class="text-sm block">企業會員</span>
+                    </div>
+                    <div class="bg-white bg-opacity-20 px-4 py-2 rounded-lg">
+                        <span id="activeMembers" class="text-2xl font-bold">-</span>
+                        <span class="text-sm block">活躍會員</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 篩選和搜尋 -->
+        <section class="bg-white py-8 border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <!-- 會員類型篩選 -->
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterByMembership('all')" 
+                                class="filter-button active px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium transition-colors">
+                            全部
+                        </button>
+                        <button onclick="filterByMembership('platinum')" 
+                                class="filter-button px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium transition-colors">
+                            白金會員
+                        </button>
+                        <button onclick="filterByMembership('gold')" 
+                                class="filter-button px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium transition-colors">
+                            金級會員
+                        </button>
+                        <button onclick="filterByMembership('silver')" 
+                                class="filter-button px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium transition-colors">
+                            銀級會員
+                        </button>
+                        <button onclick="filterByMembership('bronze')" 
+                                class="filter-button px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium transition-colors">
+                            銅級會員
+                        </button>
+                    </div>
+
+                    <!-- 搜尋和排序 -->
+                    <div class="flex gap-4">
+                        <div class="relative">
+                            <input type="text" 
+                                   id="searchInput"
+                                   placeholder="搜尋企業名稱..."
+                                   class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        
+                        <select id="sortSelect" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="displayOrder">依排序顯示</option>
+                            <option value="companyName">依公司名稱</option>
+                            <option value="joinDate">依加入時間</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 會員列表 -->
+        <section class="py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- 載入狀態 -->
+                <div id="loadingState" class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <div class="mt-4 text-gray-600">載入企業會員中...</div>
+                </div>
+
+                <!-- 企業會員網格 -->
+                <div id="membersGrid" class="hidden">
+                    <div id="membersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- 會員卡片將在這裡動態插入 -->
+                    </div>
+
+                    <!-- 載入更多按鈕 -->
+                    <div id="loadMoreSection" class="text-center mt-12">
+                        <button id="loadMoreBtn" 
+                                onclick="loadMoreMembers()"
+                                class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                            載入更多
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 空狀態 -->
+                <div id="emptyState" class="hidden text-center py-12">
+                    <svg class="mx-auto h-24 w-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900">暫無企業會員</h3>
+                    <p class="mt-2 text-gray-500">目前沒有符合條件的企業會員</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 頁腳 -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 ACTC 國際資訊安全人才培育與推廣協會. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Analytics Tracker -->
+    <script src="/components/AnalyticsTracker.js"></script>
+
+    <script>
+        // 全域變數
+        let currentPage = 1;
+        let currentFilter = 'all';
+        let currentSort = 'displayOrder';
+        let searchTerm = '';
+        let hasMore = true;
+        let isLoading = false;
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏢 企業會員頁面載入完成');
+            
+            // 載入統計和會員資料
+            loadStats();
+            loadMembers();
+            
+            // 設定搜尋和排序事件監聽器
+            setupEventListeners();
+            
+            // Google Analytics 追蹤
+            gtag('event', 'page_view', {
+                page_title: '企業會員',
+                page_location: window.location.href
+            });
+        });
+
+        // 設定事件監聽器
+        function setupEventListeners() {
+            // 搜尋輸入框
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchTerm = this.value.trim();
+                    resetAndReload();
+                }, 500);
+            });
+
+            // 排序選擇
+            document.getElementById('sortSelect').addEventListener('change', function() {
+                currentSort = this.value;
+                resetAndReload();
+            });
+        }
+
+        // 載入統計資料
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/corporate-members/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalMembers').textContent = data.stats.displayed || 0;
+                    document.getElementById('activeMembers').textContent = data.stats.active || 0;
+                }
+            } catch (error) {
+                console.error('載入統計失敗:', error);
+            }
+        }
+
+        // 載入企業會員
+        async function loadMembers(append = false) {
+            if (isLoading) return;
+            isLoading = true;
+
+            try {
+                const params = new URLSearchParams({
+                    limit: 12,
+                    skip: append ? (currentPage - 1) * 12 : 0,
+                    sortBy: currentSort
+                });
+
+                if (currentFilter !== 'all') {
+                    params.append('membershipType', currentFilter);
+                }
+
+                if (searchTerm) {
+                    params.append('search', searchTerm);
+                }
+
+                const response = await fetch(`/api/corporate-members/displayed?${params}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    if (!append) {
+                        document.getElementById('membersContainer').innerHTML = '';
+                        currentPage = 1;
+                    }
+
+                    if (data.members.length === 0 && !append) {
+                        showEmptyState();
+                    } else {
+                        hideEmptyState();
+                        renderMembers(data.members, append);
+                        hasMore = data.pagination.hasMore;
+                        updateLoadMoreButton();
+                    }
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('載入企業會員失敗:', error);
+                showErrorMessage('載入企業會員失敗，請稍後再試');
+            } finally {
+                isLoading = false;
+                hideLoadingState();
+            }
+        }
+
+        // 渲染企業會員
+        function renderMembers(members, append = false) {
+            const container = document.getElementById('membersContainer');
+            
+            const membersHTML = members.map(member => {
+                return createMemberCard(member);
+            }).join('');
+
+            if (append) {
+                container.insertAdjacentHTML('beforeend', membersHTML);
+            } else {
+                container.innerHTML = membersHTML;
+            }
+
+            // Google Analytics 追蹤
+            gtag('event', 'view_item_list', {
+                item_list_name: '企業會員列表',
+                items: members.map(member => ({
+                    item_id: member._id,
+                    item_name: member.companyName,
+                    item_category: member.membershipType
+                }))
+            });
+        }
+
+        // 創建會員卡片
+        function createMemberCard(member) {
+            const membershipClass = `membership-${member.membershipType}`;
+            const logoUrl = member.logo || '/assets/images/default-company-logo.png';
+            
+            return `
+                <div class="member-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <!-- Logo 區域 -->
+                    <div class="relative h-48 bg-gray-50 flex items-center justify-center p-6">
+                        <img src="${logoUrl}" 
+                             alt="${member.companyName}"
+                             class="max-h-full max-w-full object-contain"
+                             onerror="this.src='/assets/images/default-company-logo.png'">
+                        
+                        <!-- 會員等級徽章 -->
+                        <div class="absolute top-3 right-3 ${membershipClass} px-2 py-1 rounded text-xs font-medium">
+                            ${getMembershipDisplayName(member.membershipType)}
+                        </div>
+                    </div>
+
+                    <!-- 內容區域 -->
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">${member.companyName}</h3>
+                        
+                        ${member.companyNameEn ? `
+                            <p class="text-sm text-gray-600 mb-3 line-clamp-1">${member.companyNameEn}</p>
+                        ` : ''}
+                        
+                        ${member.description ? `
+                            <p class="text-sm text-gray-700 mb-4 line-clamp-3">${member.description}</p>
+                        ` : ''}
+
+                        <!-- 聯絡資訊 -->
+                        <div class="space-y-2 text-sm text-gray-600">
+                            ${member.contactPerson ? `
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    ${member.contactPerson}${member.contactTitle ? ` (${member.contactTitle})` : ''}
+                                </div>
+                            ` : ''}
+                            
+                            ${member.industry ? `
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                    ${member.industry}
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- 標籤 -->
+                        ${member.tags && member.tags.length > 0 ? `
+                            <div class="mt-4 flex flex-wrap gap-1">
+                                ${member.tags.slice(0, 3).map(tag => `
+                                    <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${tag}</span>
+                                `).join('')}
+                                ${member.tags.length > 3 ? `<span class="text-xs text-gray-500">+${member.tags.length - 3} 更多</span>` : ''}
+                            </div>
+                        ` : ''}
+
+                        <!-- 操作按鈕 -->
+                        <div class="mt-6 flex gap-2">
+                            ${member.website ? `
+                                <a href="${member.website}" 
+                                   target="_blank" 
+                                   onclick="trackMemberAction('${member._id}', 'visit_website')"
+                                   class="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                                    造訪網站
+                                </a>
+                            ` : ''}
+                            
+                            <button onclick="viewMemberDetails('${member._id}')"
+                                    class="flex-1 border border-gray-300 text-gray-700 text-center py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
+                                查看詳情
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 會員類型顯示名稱
+        function getMembershipDisplayName(type) {
+            const names = {
+                'platinum': '白金會員',
+                'gold': '金級會員',
+                'silver': '銀級會員',
+                'bronze': '銅級會員',
+                'regular': '一般會員'
+            };
+            return names[type] || '會員';
+        }
+
+        // 依會員類型篩選
+        function filterByMembership(type) {
+            // 更新按鈕狀態
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            currentFilter = type;
+            resetAndReload();
+        }
+
+        // 重置並重新載入
+        function resetAndReload() {
+            currentPage = 1;
+            hasMore = true;
+            showLoadingState();
+            loadMembers();
+        }
+
+        // 載入更多會員
+        function loadMoreMembers() {
+            if (!hasMore || isLoading) return;
+            
+            currentPage++;
+            loadMembers(true);
+        }
+
+        // 更新載入更多按鈕
+        function updateLoadMoreButton() {
+            const loadMoreSection = document.getElementById('loadMoreSection');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            
+            if (hasMore) {
+                loadMoreSection.style.display = 'block';
+                loadMoreBtn.disabled = false;
+                loadMoreBtn.textContent = '載入更多';
+            } else {
+                loadMoreSection.style.display = 'none';
+            }
+        }
+
+        // 顯示/隱藏狀態
+        function showLoadingState() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('membersGrid').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+        }
+
+        function hideLoadingState() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('membersGrid').classList.remove('hidden');
+        }
+
+        function showEmptyState() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('membersGrid').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+        }
+
+        function hideEmptyState() {
+            document.getElementById('emptyState').classList.add('hidden');
+        }
+
+        // 查看會員詳情
+        function viewMemberDetails(memberId) {
+            // 這裡可以實作彈出式詳情視窗或導向詳情頁面
+            console.log('查看會員詳情:', memberId);
+            
+            // Google Analytics 追蹤
+            gtag('event', 'view_item', {
+                item_id: memberId,
+                content_type: 'corporate_member'
+            });
+            
+            // 暫時顯示提示
+            alert('會員詳情功能開發中...');
+        }
+
+        // 追蹤會員操作
+        function trackMemberAction(memberId, action) {
+            gtag('event', action, {
+                item_id: memberId,
+                content_type: 'corporate_member'
+            });
+        }
+
+        // 顯示錯誤訊息
+        function showErrorMessage(message) {
+            // 可以實作 toast 通知或其他錯誤顯示方式
+            console.error(message);
+        }
+    </script>
+</body>
+</html>

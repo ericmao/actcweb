@@ -93,3 +93,14 @@ Thumbs.db
 
 # Temporary files
 *.tmp
+
+# Test and debug files (exclude from repository)
+test-*.html
+test-*.js
+test-*.sh
+*test*.html
+debug-*.html
+*debug*.html
+*debug*.md
+*verification*.html
+test_page.html

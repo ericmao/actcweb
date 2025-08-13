@@ -11,12 +11,15 @@ process.env.JWT_SECRET = process.env.JWT_SECRET || 'actc_super_secret_jwt_key_20
 const authRoutes = require('./routes/auth');
 const newsRoutes = require('./routes/news');
 const eventsRoutes = require('./routes/events');
+const corporateMembersRoutes = require('./routes/corporate-members');
+const usersRoutes = require('./routes/users');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 // 中間件
-app.use(helmet());
+// 暫時禁用 helmet 以測試圖片載入問題
+// app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -29,6 +32,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/events', eventsRoutes);
+app.use('/api/corporate-members', corporateMembersRoutes);
+app.use('/api/users', usersRoutes);
 
 // 首頁路由
 app.get('/', (req, res) => {
@@ -38,6 +43,54 @@ app.get('/', (req, res) => {
 // 管理後台路由
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+
+
+
+
+// 新聞相關路由
+app.get('/news', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'news.html'));
+});
+
+app.get('/news/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'news.html'));
+});
+
+app.get('/admin/news', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'admin-news.html'));
+});
+
+app.get('/corporate-members', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'corporate-members.html'));
+});
+
+app.get('/admin/corporate-members', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'admin-corporate-members.html'));
+});
+
+// 其他頁面路由
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'about.html'));
+});
+
+app.get('/corporate-members', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'corporate-members.html'));
+});
+
+app.get('/corporate-members-fixed', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'corporate-members-fixed.html'));
+});
+
+app.get('/workgroups', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'workgroups.html'));
+});
+
+
+
+app.get('/secretariat', (req, res) => {
+    res.redirect('/about.html');
 });
 
 // 404 處理
@@ -86,6 +139,7 @@ app.use((err, req, res, next) => {
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/actc_website', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    family: 4, // 强制使用 IPv4
 })
 .then(async () => {
     console.log('✅ Connected to MongoDB');
@@ -95,15 +149,24 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/actc_websit
     try {
         let user = await User.findOne({ username: 'admin' });
         if (!user) {
-            const bcrypt = require('bcryptjs');
-            const hashedPassword = await bcrypt.hash('admin', 10);
-            user = await User.create({
+            user = new User({
                 username: 'admin',
-                password: hashedPassword
+                password: 'admin', // 這會被 pre-save middleware 自動加密
+                role: 'admin',
+                isFirstLogin: false // 預設管理員不需要強制改密碼
             });
+            await user.save();
             console.log('✅ Default admin account created (admin/admin)');
         } else {
-            console.log('✅ Admin account already exists');
+            // 檢查現有管理員是否有正確的角色
+            if (!user.role) {
+                user.role = 'admin';
+                user.isFirstLogin = false;
+                await user.save();
+                console.log('✅ Admin account updated with role');
+            } else {
+                console.log('✅ Admin account already exists');
+            }
         }
         
         // 創建預設新聞資料
@@ -170,6 +233,6 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/actc_websit
 
 // 啟動服務器
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on  http://localhost:${PORT}`);
     console.log(`📱 Admin panel: http://localhost:${PORT}/admin`);
 });

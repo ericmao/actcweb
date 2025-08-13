@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最新消息 - ACTC 國際資訊安全人才培育與推廣協會</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="ACTC 最新消息，包含資訊安全培訓課程、活動、研討會等最新資訊。">
+    <meta name="keywords" content="ACTC, 資訊安全, 培訓, 課程, 活動, 最新消息">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="最新消息 - ACTC">
+    <meta property="og:description" content="ACTC 最新消息，包含資訊安全培訓課程、活動、研討會等最新資訊。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://actc.org.tw/news">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-424DY83DBT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-424DY83DBT');
+        
+        // 設定全域 Measurement ID
+        window.GA_MEASUREMENT_ID = 'G-424DY83DBT';
+    </script>
+    
+    <!-- Custom Styles -->
+    <style>
+        /* 自定義樣式 */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        @media (max-width: 640px) {
+            .news-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+        
+        /* 載入動畫 */
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 篩選按鈕樣式 */
+        .filter-btn {
+            @apply px-4 py-2 rounded-full text-sm font-medium transition-all duration-200;
+        }
+        
+        .filter-btn.active {
+            @apply bg-blue-600 text-white shadow-lg;
+        }
+        
+        .filter-btn:not(.active) {
+            @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 導航列 -->
+    <nav class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <img src="/assets/images/actc-logo.jpg" alt="ACTC Logo" class="h-10 w-auto">
+                        <span class="ml-3 text-xl font-bold text-gray-900">ACTC</span>
+                    </a>
+                </div>
+                
+                <!-- 導航連結 -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">首頁</a>
+                        <a href="/news" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">最新消息</a>
+                        <a href="/about" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">關於我們</a>
+                        <a href="/corporate-members" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">企業會員</a>
+                        <a href="/workgroups" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">工作小組</a>
+                    </div>
+                </div>
+                
+                <!-- 手機選單按鈕 -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 手機選單 -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+                <a href="/" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">首頁</a>
+                <a href="/news" class="text-blue-600 block px-3 py-2 rounded-md text-base font-medium">最新消息</a>
+                <a href="/about" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">關於我們</a>
+                <a href="/corporate-members" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">企業會員</a>
+                <a href="/workgroups" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">工作小組</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 頁面標題區域 -->
+    <section class="gradient-bg text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">最新消息</h1>
+            <p class="text-xl opacity-90 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+                掌握資訊安全領域的最新動態、培訓課程與活動資訊
+            </p>
+        </div>
+    </section>
+
+    <!-- 主要內容區域 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- 搜尋和篩選區域 -->
+        <div class="mb-8" data-aos="fade-up">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <!-- 搜尋框 -->
+                <div class="relative flex-1 max-w-md">
+                    <input type="text" 
+                           id="searchInput" 
+                           placeholder="搜尋新聞..." 
+                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- 排序選項 -->
+                <div class="flex items-center space-x-4">
+                    <label for="sortSelect" class="text-sm font-medium text-gray-700">排序：</label>
+                    <select id="sortSelect" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="publishDate-desc">最新發布</option>
+                        <option value="publishDate-asc">最早發布</option>
+                        <option value="viewCount-desc">最多瀏覽</option>
+                        <option value="title-asc">標題 A-Z</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 篩選標籤 -->
+            <div class="flex flex-wrap items-center gap-2 mb-4">
+                <span class="text-sm font-medium text-gray-700 mr-2">篩選：</span>
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="featured">精選</button>
+                <div id="tagFilters" class="flex flex-wrap gap-2">
+                    <!-- 動態載入的標籤篩選器 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 精選新聞區域 -->
+        <section id="featuredSection" class="mb-12" data-aos="fade-up">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <svg class="w-6 h-6 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+                精選新聞
+            </h2>
+            <div id="featuredNews" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 精選新聞將在這裡動態載入 -->
+            </div>
+        </section>
+
+        <!-- 熱門新聞區域 -->
+        <section id="trendingSection" class="mb-12" data-aos="fade-up">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <svg class="w-6 h-6 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"></path>
+                </svg>
+                熱門新聞
+            </h2>
+            <div id="trendingNews" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- 熱門新聞將在這裡動態載入 -->
+            </div>
+        </section>
+
+        <!-- 所有新聞區域 -->
+        <section id="allNewsSection" data-aos="fade-up">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">所有新聞</h2>
+                <div class="text-sm text-gray-500">
+                    共 <span id="totalNews">0</span> 篇新聞
+                </div>
+            </div>
+            
+            <!-- 載入指示器 -->
+            <div id="loadingIndicator" class="flex justify-center items-center py-12">
+                <div class="loading-spinner"></div>
+                <span class="ml-3 text-gray-600">載入中...</span>
+            </div>
+            
+            <!-- 新聞網格 -->
+            <div id="newsGrid" class="news-grid hidden">
+                <!-- 新聞卡片將在這裡動態載入 -->
+            </div>
+            
+            <!-- 無結果提示 -->
+            <div id="noResults" class="hidden text-center py-12">
+                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.485 0-4.735.727-6.584 1.99m6.584-3.95A7.963 7.963 0 0112 15.004M18 21l-3-3.001L12 15.004M6 21l3-3.001L12 15.004"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-700 mb-2">沒有找到相關新聞</h3>
+                <p class="text-gray-500">請嘗試調整搜尋條件或篩選選項</p>
+            </div>
+            
+            <!-- 載入更多按鈕 -->
+            <div id="loadMoreSection" class="hidden text-center mt-8">
+                <button id="loadMoreBtn" 
+                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                    <span id="loadMoreText">載入更多</span>
+                    <svg id="loadMoreSpinner" class="hidden animate-spin ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 頁腳 -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">ACTC 協會</h3>
+                    <p class="text-gray-300">致力於推動資訊安全領域的人才培育，提供專業的培訓課程、認證考試和國際交流機會。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">快速連結</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-300 hover:text-white transition-colors">首頁</a></li>
+                        <li><a href="/about" class="text-gray-300 hover:text-white transition-colors">關於我們</a></li>
+                        <li><a href="/news" class="text-gray-300 hover:text-white transition-colors">最新消息</a></li>
+                        <li><a href="/corporate-members" class="text-gray-300 hover:text-white transition-colors">企業會員</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">聯絡我們</h3>
+                    <p class="text-gray-300">
+                        電話: (02) 1234-5678<br>
+                        Email: info@actc.org.tw<br>
+                        地址: 台北市信義區信義路五段7號
+                    </p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-400">&copy; 2025 ACTC 國際資訊安全人才培育與推廣協會. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/components/AnalyticsTracker.js"></script>
+    <script src="/components/NewsCard.js"></script>
+    <script>
+        // 全域變數
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentFilter = 'all';
+        let currentSort = 'publishDate-desc';
+        let currentSearch = '';
+        let isLoading = false;
+        let allTags = [];
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化 AOS 動畫
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+
+            // 初始化 Analytics 追蹤
+            if (window.analyticsTracker) {
+                window.analyticsTracker.initPageTracking('news_list', null, {
+                    page_type: 'news_list',
+                    section: 'public'
+                });
+            }
+
+            // 初始化事件監聽器
+            initEventListeners();
+            
+            // 載入數據
+            loadTags();
+            loadFeaturedNews();
+            loadTrendingNews();
+            loadNews();
+        });
+
+        // 初始化事件監聽器
+        function initEventListeners() {
+            // 手機選單
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // 搜尋框
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = e.target.value;
+                    currentSearch = searchTerm;
+                    currentPage = 1;
+                    
+                    // 追蹤搜尋事件
+                    if (searchTerm && window.analyticsTracker) {
+                        // 延遲追蹤以確保搜尋結果已載入
+                        setTimeout(() => {
+                            const resultCount = document.getElementById('totalNews').textContent;
+                            window.analyticsTracker.trackSearch(searchTerm, parseInt(resultCount) || 0);
+                        }, 1000);
+                    }
+                    
+                    loadNews(true);
+                }, 500);
+            });
+
+            // 排序選擇
+            const sortSelect = document.getElementById('sortSelect');
+            sortSelect.addEventListener('change', (e) => {
+                currentSort = e.target.value;
+                currentPage = 1;
+                loadNews(true);
+            });
+
+            // 篩選按鈕
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    // 移除所有 active 類別
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // 添加 active 類別到點擊的按鈕
+                    e.target.classList.add('active');
+                    
+                    // 設置篩選條件
+                    const filter = e.target.dataset.filter;
+                    if (filter === 'all') {
+                        currentFilter = 'all';
+                    } else if (filter === 'featured') {
+                        currentFilter = 'featured';
+                    } else {
+                        currentFilter = filter; // 標籤篩選
+                    }
+                    
+                    currentPage = 1;
+                    loadNews(true);
+                }
+            });
+
+            // 載入更多按鈕
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            loadMoreBtn.addEventListener('click', () => {
+                if (currentPage < totalPages && !isLoading) {
+                    currentPage++;
+                    loadNews(false);
+                }
+            });
+        }
+
+        // 載入標籤
+        async function loadTags() {
+            try {
+                const response = await fetch('/api/news/tags');
+                if (response.ok) {
+                    const tags = await response.json();
+                    allTags = tags;
+                    renderTagFilters(tags);
+                }
+            } catch (error) {
+                console.error('Error loading tags:', error);
+            }
+        }
+
+        // 渲染標籤篩選器
+        function renderTagFilters(tags) {
+            const tagFilters = document.getElementById('tagFilters');
+            tagFilters.innerHTML = tags.slice(0, 10).map(tag => 
+                `<button class="filter-btn" data-filter="${tag.name}">
+                    #${tag.name} (${tag.count})
+                </button>`
+            ).join('');
+        }
+
+        // 載入精選新聞
+        async function loadFeaturedNews() {
+            try {
+                const response = await fetch('/api/news/featured?limit=3');
+                if (response.ok) {
+                    const featuredNews = await response.json();
+                    renderFeaturedNews(featuredNews);
+                }
+            } catch (error) {
+                console.error('Error loading featured news:', error);
+            }
+        }
+
+        // 渲染精選新聞
+        function renderFeaturedNews(newsArray) {
+            const container = document.getElementById('featuredNews');
+            
+            if (newsArray.length === 0) {
+                document.getElementById('featuredSection').style.display = 'none';
+                return;
+            }
+            
+            container.innerHTML = newsArray.map(news => {
+                const newsCard = new NewsCard(news, { enableTracking: true });
+                return newsCard.render();
+            }).join('');
+        }
+
+        // 載入熱門新聞
+        async function loadTrendingNews() {
+            try {
+                const response = await fetch('/api/news/trending?limit=4');
+                if (response.ok) {
+                    const trendingNews = await response.json();
+                    renderTrendingNews(trendingNews);
+                }
+            } catch (error) {
+                console.error('Error loading trending news:', error);
+            }
+        }
+
+        // 渲染熱門新聞
+        function renderTrendingNews(newsArray) {
+            const container = document.getElementById('trendingNews');
+            
+            if (newsArray.length === 0) {
+                document.getElementById('trendingSection').style.display = 'none';
+                return;
+            }
+            
+            container.innerHTML = newsArray.map(news => {
+                const newsCard = new NewsCard(news, { enableTracking: true });
+                return newsCard.render();
+            }).join('');
+        }
+
+        // 載入新聞列表
+        async function loadNews(reset = false) {
+            if (isLoading) return;
+            
+            isLoading = true;
+            
+            // 顯示載入指示器
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const newsGrid = document.getElementById('newsGrid');
+            const noResults = document.getElementById('noResults');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            const loadMoreSpinner = document.getElementById('loadMoreSpinner');
+            const loadMoreText = document.getElementById('loadMoreText');
+            
+            if (reset) {
+                newsGrid.classList.add('hidden');
+                noResults.classList.add('hidden');
+                loadingIndicator.classList.remove('hidden');
+            } else {
+                loadMoreSpinner.classList.remove('hidden');
+                loadMoreText.textContent = '載入中...';
+                loadMoreBtn.disabled = true;
+            }
+
+            try {
+                // 構建查詢參數
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: 12,
+                    ...(currentSearch && { search: currentSearch }),
+                    ...(currentFilter === 'featured' && { featured: 'true' }),
+                    ...(currentFilter !== 'all' && currentFilter !== 'featured' && { tag: currentFilter })
+                });
+
+                // 解析排序參數
+                const [sortField, sortOrder] = currentSort.split('-');
+                params.append('sortBy', sortField);
+                params.append('order', sortOrder);
+
+                const response = await fetch(`/api/news/published?${params}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (reset) {
+                        newsGrid.innerHTML = '';
+                    }
+                    
+                    // 更新分頁資訊
+                    totalPages = data.pagination.pages;
+                    document.getElementById('totalNews').textContent = data.pagination.total;
+                    
+                    // 渲染新聞
+                    if (data.news.length > 0) {
+                        const newsHTML = data.news.map(news => {
+                            const newsCard = new NewsCard(news, { enableTracking: true });
+                            return newsCard.render();
+                        }).join('');
+                        
+                        newsGrid.innerHTML += newsHTML;
+                        
+                        // 顯示新聞網格
+                        loadingIndicator.classList.add('hidden');
+                        newsGrid.classList.remove('hidden');
+                        noResults.classList.add('hidden');
+                        
+                        // 處理載入更多按鈕
+                        const loadMoreSection = document.getElementById('loadMoreSection');
+                        if (currentPage < totalPages) {
+                            loadMoreSection.classList.remove('hidden');
+                        } else {
+                            loadMoreSection.classList.add('hidden');
+                        }
+                        
+                        // 初始化 AOS 動畫
+                        AOS.refresh();
+                        
+                    } else if (reset) {
+                        // 沒有結果
+                        loadingIndicator.classList.add('hidden');
+                        newsGrid.classList.add('hidden');
+                        noResults.classList.remove('hidden');
+                        document.getElementById('loadMoreSection').classList.add('hidden');
+                    }
+                } else {
+                    throw new Error('Failed to load news');
+                }
+                
+            } catch (error) {
+                console.error('Error loading news:', error);
+                if (reset) {
+                    loadingIndicator.classList.add('hidden');
+                    noResults.classList.remove('hidden');
+                }
+            } finally {
+                isLoading = false;
+                loadMoreSpinner.classList.add('hidden');
+                loadMoreText.textContent = '載入更多';
+                loadMoreBtn.disabled = false;
+            }
+        }
+
+        // 全域函數供 NewsCard 使用
+        window.loadNews = () => loadNews(true);
+        
+        window.filterNewsByTag = (tag) => {
+            // 移除所有 active 類別
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 添加 active 類別到對應的標籤按鈕
+            const tagBtn = document.querySelector(`[data-filter="${tag}"]`);
+            if (tagBtn) {
+                tagBtn.classList.add('active');
+            }
+            
+            currentFilter = tag;
+            currentPage = 1;
+            
+            // 追蹤標籤篩選事件
+            if (window.analyticsTracker) {
+                setTimeout(() => {
+                    const resultCount = document.getElementById('totalNews').textContent;
+                    window.analyticsTracker.trackTagFilter(tag, parseInt(resultCount) || 0);
+                }, 1000);
+            }
+            
+            loadNews(true);
+        };
+        
+        window.showNewsModal = (newsId) => {
+            // 實現新聞詳情模態框
+            window.location.href = `/news/${newsId}`;
+        };
+    </script>
+</body>
+</html>

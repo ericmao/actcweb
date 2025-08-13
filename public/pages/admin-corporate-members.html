@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企業會員管理 - ACTC 管理後台</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-424DY83DBT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-424DY83DBT');
+    </script>
+
+    <style>
+        .membership-badge {
+            @apply px-2 py-1 rounded text-xs font-medium;
+        }
+        
+        .membership-platinum {
+            @apply bg-gray-200 text-gray-700;
+        }
+        
+        .membership-gold {
+            @apply bg-yellow-200 text-yellow-800;
+        }
+        
+        .membership-silver {
+            @apply bg-gray-300 text-gray-700;
+        }
+        
+        .membership-bronze {
+            @apply bg-orange-200 text-orange-800;
+        }
+        
+        .membership-regular {
+            @apply bg-blue-200 text-blue-800;
+        }
+        
+        .status-active {
+            @apply bg-green-100 text-green-800;
+        }
+        
+        .status-inactive {
+            @apply bg-red-100 text-red-800;
+        }
+        
+        .display-shown {
+            @apply bg-blue-100 text-blue-800;
+        }
+        
+        .display-hidden {
+            @apply bg-gray-100 text-gray-800;
+        }
+        
+        .table-container {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50" x-data="corporateMemberApp()">
+    <!-- 導航欄 -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/admin" class="flex items-center">
+                        <img src="/assets/images/actc-logo.jpg" alt="ACTC Logo" class="h-10 w-auto">
+                        <span class="ml-3 text-xl font-bold text-gray-900">ACTC 管理後台</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/admin" class="text-gray-700 hover:text-blue-600 transition-colors">返回主控台</a>
+                    <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                        登出
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 頁面標題和統計 -->
+        <div class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">企業會員管理</h1>
+                    <p class="text-gray-600 mt-2">管理企業會員資料，控制前端顯示</p>
+                </div>
+                <button @click="showCreateModal = true" 
+                        class="mt-4 md:mt-0 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    新增企業會員
+                </button>
+            </div>
+
+            <!-- 統計卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">總企業會員</p>
+                            <p class="text-2xl font-semibold text-gray-900" x-text="stats.total || 0"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">啟用中</p>
+                            <p class="text-2xl font-semibold text-gray-900" x-text="stats.active || 0"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">前端顯示</p>
+                            <p class="text-2xl font-semibold text-gray-900" x-text="stats.displayed || 0"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-yellow-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">金級以上</p>
+                            <p class="text-2xl font-semibold text-gray-900" x-text="premiumMembersCount"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 篩選和搜尋工具 -->
+        <div class="bg-white rounded-lg shadow mb-6 p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">搜尋</label>
+                    <input type="text" 
+                           x-model="searchTerm"
+                           @input.debounce.500ms="loadMembers()"
+                           placeholder="搜尋企業名稱、聯絡人..."
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">會員類型</label>
+                    <select x-model="membershipFilter" @change="loadMembers()" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">全部類型</option>
+                        <option value="platinum">白金會員</option>
+                        <option value="gold">金級會員</option>
+                        <option value="silver">銀級會員</option>
+                        <option value="bronze">銅級會員</option>
+                        <option value="regular">一般會員</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">狀態</label>
+                    <select x-model="statusFilter" @change="loadMembers()"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">全部狀態</option>
+                        <option value="active">啟用</option>
+                        <option value="inactive">停用</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">顯示狀態</label>
+                    <select x-model="displayFilter" @change="loadMembers()"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">全部</option>
+                        <option value="displayed">前端顯示</option>
+                        <option value="hidden">前端隱藏</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量操作工具 -->
+        <div class="bg-white rounded-lg shadow mb-6 p-4" x-show="selectedMembers.length > 0">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm font-medium text-gray-700">
+                        已選擇 <span x-text="selectedMembers.length"></span> 個企業會員
+                    </span>
+                    <button @click="selectAll()" class="text-sm text-blue-600 hover:text-blue-800">全選</button>
+                    <button @click="clearSelection()" class="text-sm text-gray-600 hover:text-gray-800">清除選擇</button>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button @click="batchUpdateDisplay(true)" 
+                            class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                        批量顯示
+                    </button>
+                    <button @click="batchUpdateDisplay(false)" 
+                            class="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700">
+                        批量隱藏
+                    </button>
+                    <button @click="batchUpdateStatus(true)" 
+                            class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                        批量啟用
+                    </button>
+                    <button @click="batchUpdateStatus(false)" 
+                            class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                        批量停用
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 企業會員列表 -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="table-container">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-6 py-3 text-left">
+                                <input type="checkbox" 
+                                       @change="toggleSelectAll($event)"
+                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                企業資訊
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                會員類型
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                聲絡資訊
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                狀態
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                顯示順序
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                操作
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <template x-for="member in members" :key="member._id">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="checkbox" 
+                                           :value="member._id"
+                                           x-model="selectedMembers"
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                </td>
+                                
+                                <!-- 企業資訊 -->
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-12 w-12">
+                                            <img :src="member.logo || '/assets/images/default-company-logo.png'" 
+                                                 :alt="member.companyName"
+                                                 class="h-12 w-12 object-contain rounded-lg border">
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900" x-text="member.companyName"></div>
+                                            <div class="text-sm text-gray-500" x-text="member.companyNameEn"></div>
+                                            <div class="text-xs text-gray-400" x-text="member.industry"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                                <!-- 會員類型 -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span :class="'membership-badge membership-' + member.membershipType" 
+                                          x-text="getMembershipName(member.membershipType)"></span>
+                                    <div class="text-xs text-gray-500 mt-1" x-text="member.membershipLevel"></div>
+                                </td>
+                                
+                                <!-- 聯絡資訊 -->
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900" x-text="member.contactPerson"></div>
+                                    <div class="text-sm text-gray-500" x-text="member.email"></div>
+                                    <div class="text-xs text-gray-400" x-text="member.phone"></div>
+                                </td>
+                                
+                                <!-- 狀態 -->
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col space-y-1">
+                                        <span :class="'px-2 py-1 rounded text-xs font-medium ' + (member.isActive ? 'status-active' : 'status-inactive')"
+                                              x-text="member.isActive ? '啟用' : '停用'"></span>
+                                        <span :class="'px-2 py-1 rounded text-xs font-medium ' + (member.isDisplayed ? 'display-shown' : 'display-hidden')"
+                                              x-text="member.isDisplayed ? '前端顯示' : '前端隱藏'"></span>
+                                    </div>
+                                </td>
+                                
+                                <!-- 顯示順序 -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="number" 
+                                           :value="member.displayOrder"
+                                           @change="updateDisplayOrder(member._id, $event.target.value)"
+                                           class="w-16 px-2 py-1 border border-gray-300 rounded text-sm">
+                                </td>
+                                
+                                <!-- 操作 -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex space-x-2">
+                                        <button @click="editMember(member)" 
+                                                class="text-blue-600 hover:text-blue-900">編輯</button>
+                                        <button @click="toggleDisplay(member._id)" 
+                                                class="text-purple-600 hover:text-purple-900"
+                                                x-text="member.isDisplayed ? '隱藏' : '顯示'"></button>
+                                        <button @click="toggleStatus(member._id)" 
+                                                class="text-green-600 hover:text-green-900"
+                                                x-text="member.isActive ? '停用' : '啟用'"></button>
+                                        <button @click="deleteMember(member._id)" 
+                                                class="text-red-600 hover:text-red-900">刪除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分頁 -->
+            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <button @click="loadPreviousPage()" 
+                                :disabled="pagination.page <= 1"
+                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
+                            上一頁
+                        </button>
+                        <button @click="loadNextPage()" 
+                                :disabled="pagination.page >= pagination.pages"
+                                class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
+                            下一頁
+                        </button>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                顯示第 <span x-text="((pagination.page - 1) * pagination.limit) + 1"></span> 到 
+                                <span x-text="Math.min(pagination.page * pagination.limit, pagination.total)"></span> 筆，
+                                共 <span x-text="pagination.total"></span> 筆記錄
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                                <button @click="loadPreviousPage()" 
+                                        :disabled="pagination.page <= 1"
+                                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50">
+                                    上一頁
+                                </button>
+                                <button @click="loadNextPage()" 
+                                        :disabled="pagination.page >= pagination.pages"
+                                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50">
+                                    下一頁
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 創建/編輯企業會員的模態框 -->
+    <div x-show="showCreateModal || showEditModal" 
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="closeModal()"
+         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        
+        <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white" @click.stop>
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4" 
+                    x-text="showCreateModal ? '新增企業會員' : '編輯企業會員'"></h3>
+                
+                <form @submit.prevent="showCreateModal ? createMember() : updateMember()" enctype="multipart/form-data">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 基本資訊 -->
+                        <div class="col-span-2">
+                            <h4 class="text-md font-medium text-gray-900 mb-3">基本資訊</h4>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">公司名稱 *</label>
+                            <input type="text" x-model="memberForm.companyName" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">英文公司名稱</label>
+                            <input type="text" x-model="memberForm.companyNameEn"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">公司描述</label>
+                            <textarea x-model="memberForm.description" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                        
+                        <!-- 會員資訊 -->
+                        <div class="col-span-2">
+                            <h4 class="text-md font-medium text-gray-900 mb-3 mt-6">會員資訊</h4>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">會員類型</label>
+                            <select x-model="memberForm.membershipType" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="regular">一般會員</option>
+                                <option value="bronze">銅級會員</option>
+                                <option value="silver">銀級會員</option>
+                                <option value="gold">金級會員</option>
+                                <option value="platinum">白金會員</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">會員等級</label>
+                            <select x-model="memberForm.membershipLevel"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="C">C</option>
+                                <option value="B">B</option>
+                                <option value="B+">B+</option>
+                                <option value="A">A</option>
+                                <option value="A+">A+</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 聯絡資訊 -->
+                        <div class="col-span-2">
+                            <h4 class="text-md font-medium text-gray-900 mb-3 mt-6">聯絡資訊</h4>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">聯絡人 *</label>
+                            <input type="text" x-model="memberForm.contactPerson" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">職稱</label>
+                            <input type="text" x-model="memberForm.contactTitle"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                            <input type="email" x-model="memberForm.email" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">電話</label>
+                            <input type="text" x-model="memberForm.phone"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">網站</label>
+                            <input type="url" x-model="memberForm.website"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">行業</label>
+                            <input type="text" x-model="memberForm.industry"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <!-- Logo上傳 -->
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">公司Logo</label>
+                            <input type="file" 
+                                   @change="handleLogoUpload($event)"
+                                   accept="image/*"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <div x-show="memberForm.logo" class="mt-2">
+                                <img :src="memberForm.logo" alt="Logo預覽" class="h-20 w-20 object-contain border rounded">
+                            </div>
+                        </div>
+                        
+                        <!-- 設定 -->
+                        <div class="col-span-2">
+                            <h4 class="text-md font-medium text-gray-900 mb-3 mt-6">設定</h4>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">顯示順序</label>
+                            <input type="number" x-model="memberForm.displayOrder" min="0"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div class="flex items-center space-x-6">
+                            <label class="flex items-center">
+                                <input type="checkbox" x-model="memberForm.isActive" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-700">啟用狀態</span>
+                            </label>
+                            
+                            <label class="flex items-center">
+                                <input type="checkbox" x-model="memberForm.isDisplayed" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-700">前端顯示</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 按鈕 -->
+                    <div class="flex justify-end space-x-4 mt-8">
+                        <button type="button" @click="closeModal()" 
+                                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            取消
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            <span x-text="showCreateModal ? '創建' : '更新'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div x-show="toast.show" 
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform translate-y-2"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform translate-y-2"
+         class="fixed bottom-4 right-4 max-w-xs bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div class="p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg x-show="toast.type === 'success'" class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <svg x-show="toast.type === 'error'" class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </div>
+                <div class="ml-3 w-0 flex-1">
+                    <p class="text-sm font-medium text-gray-900" x-text="toast.message"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function corporateMemberApp() {
+            return {
+                // 資料狀態
+                members: [],
+                stats: {},
+                selectedMembers: [],
+                
+                // 分頁狀態
+                pagination: {
+                    page: 1,
+                    limit: 20,
+                    total: 0,
+                    pages: 0
+                },
+                
+                // 篩選狀態
+                searchTerm: '',
+                membershipFilter: '',
+                statusFilter: '',
+                displayFilter: '',
+                
+                // 模態框狀態
+                showCreateModal: false,
+                showEditModal: false,
+                editingMember: null,
+                
+                // 表單狀態
+                memberForm: {
+                    companyName: '',
+                    companyNameEn: '',
+                    description: '',
+                    contactPerson: '',
+                    contactTitle: '',
+                    email: '',
+                    phone: '',
+                    website: '',
+                    industry: '',
+                    membershipType: 'regular',
+                    membershipLevel: 'C',
+                    displayOrder: 0,
+                    isActive: true,
+                    isDisplayed: false,
+                    logo: ''
+                },
+                
+                // Toast通知
+                toast: {
+                    show: false,
+                    type: 'success',
+                    message: ''
+                },
+                
+                // 初始化
+                init() {
+                    console.log('企業會員管理頁面初始化...');
+                    console.log('初始模態框狀態:', {
+                        showCreateModal: this.showCreateModal,
+                        showEditModal: this.showEditModal
+                    });
+                    
+                    // 確保模態框初始狀態為關閉
+                    this.showCreateModal = false;
+                    this.showEditModal = false;
+                    
+                    this.loadMembers();
+                    this.loadStats();
+                },
+                
+                // 載入企業會員
+                async loadMembers() {
+                    try {
+                        const token = localStorage.getItem('adminToken');
+                        if (!token) {
+                            window.location.href = '/admin';
+                            return;
+                        }
+                        
+                        const params = new URLSearchParams({
+                            page: this.pagination.page,
+                            limit: this.pagination.limit
+                        });
+                        
+                        if (this.searchTerm) params.append('search', this.searchTerm);
+                        if (this.membershipFilter) params.append('membershipType', this.membershipFilter);
+                        if (this.statusFilter) params.append('isActive', this.statusFilter === 'active');
+                        if (this.displayFilter) params.append('isDisplayed', this.displayFilter === 'displayed');
+                        
+                        const response = await fetch(`/api/corporate-members/admin?${params}`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.members = data.members;
+                            this.pagination = data.pagination;
+                            this.stats = data.stats?.[0] || {};
+                        } else {
+                            this.showToast('error', data.message);
+                        }
+                    } catch (error) {
+                        console.error('載入企業會員失敗:', error);
+                        this.showToast('error', '載入企業會員失敗');
+                    }
+                },
+                
+                // 載入統計
+                async loadStats() {
+                    try {
+                        const response = await fetch('/api/corporate-members/stats');
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.stats = data.stats;
+                        }
+                    } catch (error) {
+                        console.error('載入統計失敗:', error);
+                    }
+                },
+                
+                // 創建企業會員
+                async createMember() {
+                    try {
+                        const token = localStorage.getItem('adminToken');
+                        const formData = new FormData();
+                        
+                        console.log('🔍 創建會員資料:', this.memberForm);
+                        console.log('🔍 檔案上傳:', this.logoFile);
+                        
+                        // 添加表單數據（排除logo，稍後單獨處理）
+                        Object.keys(this.memberForm).forEach(key => {
+                            if (key !== 'logo') {
+                                formData.append(key, this.memberForm[key]);
+                            }
+                        });
+                        
+                        // 處理logo：優先檔案上傳，否則使用URL
+                        if (this.logoFile) {
+                            console.log('🔍 使用檔案上傳');
+                            formData.append('logo', this.logoFile);
+                        } else if (this.memberForm.logo && typeof this.memberForm.logo === 'string') {
+                            console.log('🔍 使用圖片URL:', this.memberForm.logo);
+                            formData.append('logo', this.memberForm.logo);
+                        }
+                        
+                        const response = await fetch('/api/corporate-members/admin', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: formData
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showToast('success', '企業會員創建成功');
+                            this.closeModal();
+                            this.loadMembers();
+                            this.loadStats();
+                        } else {
+                            this.showToast('error', data.message);
+                        }
+                    } catch (error) {
+                        console.error('創建企業會員失敗:', error);
+                        this.showToast('error', '創建企業會員失敗');
+                    }
+                },
+                
+                // 編輯企業會員
+                editMember(member) {
+                    this.editingMember = member;
+                    // 只複製可編輯的欄位，避免系統欄位和虛擬欄位
+                    this.memberForm = {
+                        companyName: member.companyName || '',
+                        companyNameEn: member.companyNameEn || '',
+                        description: member.description || '',
+                        contactPerson: member.contactPerson || '',
+                        contactTitle: member.contactTitle || '',
+                        email: member.email || '',
+                        phone: member.phone || '',
+                        website: member.website || '',
+                        country: member.country || '',
+                        industry: member.industry || '',
+                        membershipType: member.membershipType || 'regular',
+                        membershipLevel: member.membershipLevel || 'C',
+                        services: member.services || [],
+                        specialization: member.specialization || [],
+                        tags: member.tags || [],
+                        displayOrder: member.displayOrder || 0,
+                        isActive: member.isActive !== undefined ? member.isActive : true,
+                        isDisplayed: member.isDisplayed !== undefined ? member.isDisplayed : false,
+                        logo: member.logo || ''
+                    };
+                    this.showEditModal = true;
+                },
+                
+                // 更新企業會員
+                async updateMember() {
+                    try {
+                        const token = localStorage.getItem('adminToken');
+                        const formData = new FormData();
+                        
+                        console.log('🔍 更新會員資料:', this.memberForm);
+                        console.log('🔍 檔案上傳:', this.logoFile);
+                        
+                        // 添加表單數據（排除logo，稍後單獨處理）
+                        Object.keys(this.memberForm).forEach(key => {
+                            if (key !== 'logo') {
+                                formData.append(key, this.memberForm[key]);
+                            }
+                        });
+                        
+                        // 處理logo：優先檔案上傳，否則使用URL
+                        if (this.logoFile) {
+                            console.log('🔍 使用檔案上傳');
+                            formData.append('logo', this.logoFile);
+                        } else if (this.memberForm.logo && typeof this.memberForm.logo === 'string') {
+                            console.log('🔍 使用圖片URL:', this.memberForm.logo);
+                            formData.append('logo', this.memberForm.logo);
+                        }
+                        
+                        const response = await fetch(`/api/corporate-members/admin/${this.editingMember._id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: formData
+                        });
+                        
+                        console.log('🔍 HTTP狀態:', response.status);
+                        
+                        const data = await response.json();
+                        console.log('🔍 伺服器響應:', data);
+                        
+                        if (data.success) {
+                            this.showToast('success', '企業會員更新成功');
+                            this.closeModal();
+                            this.loadMembers();
+                        } else {
+                            console.error('❌ 更新失敗:', data);
+                            this.showToast('error', data.message || '更新失敗');
+                        }
+                    } catch (error) {
+                        console.error('❌ 更新企業會員失敗:', error);
+                        this.showToast('error', '更新企業會員失敗: ' + error.message);
+                    }
+                },
+                
+                // 切換顯示狀態
+                async toggleDisplay(memberId) {
+                    try {
+                        const token = localStorage.getItem('adminToken');
+                        
+                        const response = await fetch(`/api/corporate-members/admin/${memberId}/toggle-display`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showToast('success', data.message);
+                            this.loadMembers();
+                            this.loadStats();
+                        } else {
+                            this.showToast('error', data.message);
+                        }
+                    } catch (error) {
+                        console.error('切換顯示狀態失敗:', error);
+                        this.showToast('error', '切換顯示狀態失敗');
+                    }
+                },
+                
+                // 切換啟用狀態
+                async toggleStatus(memberId) {
+                    try {
+                        const token = localStorage.getItem('adminToken');
+                        
+                        const response = await fetch(`/api/corporate-members/admin/${memberId}/toggle-active`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showToast('success', data.message);
+                            this.loadMembers();
+                            this.loadStats();
+                        } else {
+                            this.showToast('error', data.message);
+                        }
+                    } catch (error) {
+                        console.error('切換啟用狀態失敗:', error);
+                        this.showToast('error', '切換啟用狀態失敗');
+                    }
+                },
+                
+                // 更新顯示順序
+                async updateDisplayOrder(memberId, order) {
+                    try {
+                        const token = localStorage.getItem('adminToken');
+                        
+                        const response = await fetch(`/api/corporate-members/admin/${memberId}/display-order`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ displayOrder: parseInt(order) })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showToast('success', '顯示順序更新成功');
+                        } else {
+                            this.showToast('error', data.message);
+                        }
+                    } catch (error) {
+                        console.error('更新顯示順序失敗:', error);
+                        this.showToast('error', '更新顯示順序失敗');
+                    }
+                },
+                
+                // 刪除企業會員
+                async deleteMember(memberId) {
+                    if (!confirm('確定要刪除這個企業會員嗎？此操作無法復原。')) {
+                        return;
+                    }
+                    
+                    try {
+                        const token = localStorage.getItem('adminToken');
+                        
+                        const response = await fetch(`/api/corporate-members/admin/${memberId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showToast('success', '企業會員刪除成功');
+                            this.loadMembers();
+                            this.loadStats();
+                        } else {
+                            this.showToast('error', data.message);
+                        }
+                    } catch (error) {
+                        console.error('刪除企業會員失敗:', error);
+                        this.showToast('error', '刪除企業會員失敗');
+                    }
+                },
+                
+                // 處理logo上傳
+                handleLogoUpload(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.logoFile = file;
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.memberForm.logo = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                },
+                
+                // 批量操作
+                async batchUpdateDisplay(isDisplayed) {
+                    if (this.selectedMembers.length === 0) return;
+                    
+                    try {
+                        const token = localStorage.getItem('adminToken');
+                        
+                        const response = await fetch('/api/corporate-members/admin/batch', {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                ids: this.selectedMembers,
+                                action: 'toggleDisplay',
+                                value: isDisplayed
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showToast('success', data.message);
+                            this.clearSelection();
+                            this.loadMembers();
+                            this.loadStats();
+                        } else {
+                            this.showToast('error', data.message);
+                        }
+                    } catch (error) {
+                        console.error('批量操作失敗:', error);
+                        this.showToast('error', '批量操作失敗');
+                    }
+                },
+                
+                async batchUpdateStatus(isActive) {
+                    if (this.selectedMembers.length === 0) return;
+                    
+                    try {
+                        const token = localStorage.getItem('adminToken');
+                        
+                        const response = await fetch('/api/corporate-members/admin/batch', {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                ids: this.selectedMembers,
+                                action: 'toggleActive',
+                                value: isActive
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showToast('success', data.message);
+                            this.clearSelection();
+                            this.loadMembers();
+                            this.loadStats();
+                        } else {
+                            this.showToast('error', data.message);
+                        }
+                    } catch (error) {
+                        console.error('批量操作失敗:', error);
+                        this.showToast('error', '批量操作失敗');
+                    }
+                },
+                
+                // 選擇操作
+                toggleSelectAll(event) {
+                    if (event.target.checked) {
+                        this.selectedMembers = this.members.map(m => m._id);
+                    } else {
+                        this.selectedMembers = [];
+                    }
+                },
+                
+                selectAll() {
+                    this.selectedMembers = this.members.map(m => m._id);
+                },
+                
+                clearSelection() {
+                    this.selectedMembers = [];
+                },
+                
+                // 分頁操作
+                loadPreviousPage() {
+                    if (this.pagination.page > 1) {
+                        this.pagination.page--;
+                        this.loadMembers();
+                    }
+                },
+                
+                loadNextPage() {
+                    if (this.pagination.page < this.pagination.pages) {
+                        this.pagination.page++;
+                        this.loadMembers();
+                    }
+                },
+                
+                // 關閉模態框
+                closeModal() {
+                    console.log('關閉模態框');
+                    this.showCreateModal = false;
+                    this.showEditModal = false;
+                    this.editingMember = null;
+                    this.logoFile = null;
+                    this.memberForm = {
+                        companyName: '',
+                        companyNameEn: '',
+                        description: '',
+                        contactPerson: '',
+                        contactTitle: '',
+                        email: '',
+                        phone: '',
+                        website: '',
+                        industry: '',
+                        membershipType: 'regular',
+                        membershipLevel: 'C',
+                        displayOrder: 0,
+                        isActive: true,
+                        isDisplayed: false,
+                        logo: ''
+                    };
+                },
+                
+                // 顯示Toast
+                showToast(type, message) {
+                    this.toast = { show: true, type, message };
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 3000);
+                },
+                
+                // 取得會員類型名稱
+                getMembershipName(type) {
+                    const names = {
+                        'platinum': '白金會員',
+                        'gold': '金級會員',
+                        'silver': '銀級會員',
+                        'bronze': '銅級會員',
+                        'regular': '一般會員'
+                    };
+                    return names[type] || '會員';
+                },
+                
+                // 計算金級以上會員數
+                get premiumMembersCount() {
+                    if (!this.stats.membershipTypes) return 0;
+                    return this.stats.membershipTypes
+                        .filter(m => ['platinum', 'gold'].includes(m._id))
+                        .reduce((sum, m) => sum + m.count, 0);
+                }
+            }
+        }
+        
+        // 登出功能
+        function logout() {
+            localStorage.removeItem('adminToken');
+            window.location.href = '/admin';
+        }
+    </script>
+</body>
+</html>

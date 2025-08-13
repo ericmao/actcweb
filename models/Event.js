@@ -11,8 +11,8 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Event type is required'],
         enum: {
-            values: ['meetup', 'workshop', 'course', 'others'],
-            message: 'Event type must be one of: meetup, workshop, course, others'
+            values: ['meetup', 'workshop', 'course', 'conference', 'training', 'others'],
+            message: 'Event type must be one of: meetup, workshop, course, conference, training, others'
         }
     },
     description: {
@@ -21,15 +21,35 @@ const eventSchema = new mongoose.Schema({
         trim: true,
         maxlength: [1000, 'Description cannot exceed 1000 characters']
     },
+    shortDescription: {
+        type: String,
+        trim: true,
+        maxlength: [200, 'Short description cannot exceed 200 characters']
+    },
     date: {
         type: Date,
         required: [true, 'Date is required']
+    },
+    endDate: {
+        type: Date,
+        validate: {
+            validator: function(v) {
+                if (!v) return true; // 允許空值
+                return v >= this.date;
+            },
+            message: 'End date must be after or equal to start date'
+        }
     },
     location: {
         type: String,
         required: [true, 'Location is required'],
         trim: true,
         maxlength: [200, 'Location cannot exceed 200 characters']
+    },
+    virtualLocation: {
+        type: String,
+        trim: true,
+        maxlength: [200, 'Virtual location cannot exceed 200 characters']
     },
     link: {
         type: String,
@@ -42,6 +62,96 @@ const eventSchema = new mongoose.Schema({
             message: 'Link must be a valid URL'
         }
     },
+    // 新增欄位
+    instructor: {
+        name: {
+            type: String,
+            trim: true,
+            maxlength: [100, 'Instructor name cannot exceed 100 characters']
+        },
+        title: {
+            type: String,
+            trim: true,
+            maxlength: [100, 'Instructor title cannot exceed 100 characters']
+        },
+        company: {
+            type: String,
+            trim: true,
+            maxlength: [100, 'Company name cannot exceed 100 characters']
+        }
+    },
+    duration: {
+        hours: {
+            type: Number,
+            min: [0, 'Duration hours cannot be negative']
+        },
+        minutes: {
+            type: Number,
+            min: [0, 'Duration minutes cannot be negative'],
+            max: [59, 'Duration minutes cannot exceed 59']
+        }
+    },
+    capacity: {
+        type: Number,
+        min: [1, 'Capacity must be at least 1']
+    },
+    registeredCount: {
+        type: Number,
+        default: 0,
+        min: [0, 'Registered count cannot be negative']
+    },
+    price: {
+        amount: {
+            type: Number,
+            min: [0, 'Price cannot be negative']
+        },
+        currency: {
+            type: String,
+            default: 'TWD',
+            enum: ['TWD', 'USD', 'EUR', 'JPY']
+        },
+        isFree: {
+            type: Boolean,
+            default: true
+        }
+    },
+    status: {
+        type: String,
+        enum: ['draft', 'published', 'registration_open', 'registration_closed', 'cancelled', 'completed'],
+        default: 'draft'
+    },
+    tags: [{
+        type: String,
+        trim: true,
+        maxlength: [50, 'Tag cannot exceed 50 characters']
+    }],
+    requirements: {
+        type: String,
+        trim: true,
+        maxlength: [500, 'Requirements cannot exceed 500 characters']
+    },
+    materials: [{
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: [100, 'Material name cannot exceed 100 characters']
+        },
+        type: {
+            type: String,
+            enum: ['document', 'video', 'software', 'other'],
+            default: 'document'
+        },
+        url: {
+            type: String,
+            trim: true
+        },
+        description: {
+            type: String,
+            trim: true,
+            maxlength: [200, 'Material description cannot exceed 200 characters']
+        }
+    }],
     createdAt: {
         type: Date,
         default: Date.now
@@ -53,6 +163,8 @@ const eventSchema = new mongoose.Schema({
 // 索引優化
 eventSchema.index({ date: -1 });
 eventSchema.index({ type: 1 });
+eventSchema.index({ status: 1 });
+eventSchema.index({ tags: 1 });
 eventSchema.index({ createdAt: -1 });
 
 // 虛擬字段：格式化日期
@@ -82,6 +194,8 @@ eventSchema.virtual('typeLabel').get(function() {
         'meetup': '聚會',
         'workshop': '工作坊',
         'course': '課程',
+        'conference': '研討會',
+        'training': '培訓',
         'others': '其他'
     };
     return typeLabels[this.type] || this.type;
@@ -99,7 +213,65 @@ eventSchema.virtual('linkIcon').get(function() {
     const url = this.link.toLowerCase();
     if (url.includes('discord')) return 'fab fa-discord';
     if (url.includes('teams') || url.includes('microsoft')) return 'fab fa-microsoft';
+    if (url.includes('zoom')) return 'fas fa-video';
+    if (url.includes('meet.google')) return 'fab fa-google';
     return 'fas fa-external-link-alt';
+});
+
+// 虛擬字段：活動狀態中文名稱
+eventSchema.virtual('statusLabel').get(function() {
+    const statusLabels = {
+        'draft': '草稿',
+        'published': '已發布',
+        'registration_open': '報名開放',
+        'registration_closed': '報名截止',
+        'cancelled': '已取消',
+        'completed': '已完成'
+    };
+    return statusLabels[this.status] || this.status;
+});
+
+// 虛擬字段：檢查是否可以報名
+eventSchema.virtual('canRegister').get(function() {
+    return this.status === 'registration_open' && 
+           (!this.capacity || this.registeredCount < this.capacity);
+});
+
+// 虛擬字段：剩餘名額
+eventSchema.virtual('remainingSpots').get(function() {
+    if (!this.capacity) return null;
+    return Math.max(0, this.capacity - this.registeredCount);
+});
+
+// 虛擬字段：格式化價格
+eventSchema.virtual('formattedPrice').get(function() {
+    if (this.price.isFree) return '免費';
+    if (!this.price.amount) return '價格未定';
+    
+    const currencySymbols = {
+        'TWD': 'NT$',
+        'USD': '$',
+        'EUR': '€',
+        'JPY': '¥'
+    };
+    
+    const symbol = currencySymbols[this.price.currency] || this.price.currency;
+    return `${symbol}${this.price.amount}`;
+});
+
+// 虛擬字段：格式化時長
+eventSchema.virtual('formattedDuration').get(function() {
+    if (!this.duration) return '';
+    
+    let result = '';
+    if (this.duration.hours > 0) {
+        result += `${this.duration.hours}小時`;
+    }
+    if (this.duration.minutes > 0) {
+        result += `${this.duration.minutes}分鐘`;
+    }
+    
+    return result || '時長未定';
 });
 
 // 確保虛擬字段在 JSON 中顯示

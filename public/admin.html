@@ -3,988 +3,717 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理後台 - ACTC 國際資訊安全人才培育與推廣協會</title>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <title>管理後台 - ACTC</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* 自定義樣式 */
-        .table-row-hover:hover {
-            background-color: #f9fafb;
-            transform: scale(1.01);
-            transition: all 0.2s ease-in-out;
-        }
-        
-        .btn-primary {
-            background-color: #F97316;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: all 0.2s ease-in-out;
-        }
-        
-        .btn-primary:hover {
-            background-color: #EA580C;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-        }
-        
-        .btn-secondary {
-            background-color: #6b7280;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: all 0.2s ease-in-out;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #4b5563;
-            transform: translateY(-1px);
-        }
-        
-        .btn-danger {
-            background-color: #dc2626;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: all 0.2s ease-in-out;
-        }
-        
-        .btn-danger:hover {
-            background-color: #b91c1c;
-            transform: translateY(-1px);
-        }
-        
-        .modal-overlay {
-            backdrop-filter: blur(4px);
-        }
-        
-        .form-input:focus {
-            border-color: #F97316;
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-        }
-        
-        .category-badge {
-            background: linear-gradient(135deg, #F97316, #FB923C);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
-        }
-        
-        .file-badge {
-            background: linear-gradient(135deg, #3b82f6, #60a5fa);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-        }
-        
-        /* 動畫效果 */
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.3s ease-in-out;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
-        }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'actc-orange': '#F97316',
-                        'actc-orange-light': '#FB923C',
-                        'actc-orange-dark': '#EA580C'
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="/components/NewsManagement.js"></script>
 </head>
-<body class="bg-gray-50">
-    <!-- 導航欄 -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10">
-                        <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full">
-                    </div>
-                    <span class="text-xl font-bold text-gray-800">ACTC 管理後台</span>
+<body class="bg-gray-50" x-data="adminApp()">
+    <!-- 強制修改密碼對話框 -->
+    <div x-show="showForcePasswordChange" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-lg font-semibold mb-4">首次登入 - 請修改密碼</h3>
+            <form @submit.prevent="forceChangePassword">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">新密碼</label>
+                    <input type="password" x-model="newPassword" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
                 </div>
-                <div class="flex items-center space-x-4">
-                    <span id="adminUsername" class="text-gray-600"></span>
-                    <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors">
-                        登出
-                    </button>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">確認新密碼</label>
+                    <input type="password" x-model="confirmPassword" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
                 </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- 登入表單 -->
-    <div id="loginForm" class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
-            <div>
-                <div class="mx-auto h-12 w-12 flex items-center justify-center">
-                    <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="h-12 w-12 rounded-full">
-                </div>
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    管理員登入
-                </h2>
-                <p class="mt-2 text-center text-sm text-gray-600">
-                    請輸入您的管理員帳號密碼
-                </p>
-            </div>
-            <form class="mt-8 space-y-6" id="adminLoginForm">
-                <div class="rounded-md shadow-sm -space-y-px">
-                    <div>
-                        <label for="username" class="sr-only">帳號</label>
-                        <input id="username" name="username" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-actc-orange focus:border-actc-orange focus:z-10 sm:text-sm" placeholder="管理員帳號">
-                    </div>
-                    <div>
-                        <label for="password" class="sr-only">密碼</label>
-                        <input id="password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-actc-orange focus:border-actc-orange focus:z-10 sm:text-sm" placeholder="密碼">
-                    </div>
-                </div>
-
-                <div>
-                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-actc-orange hover:bg-actc-orange-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-actc-orange">
-                        登入
+                <div class="flex space-x-2">
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                        確認修改
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 管理後台主介面 -->
-    <div id="adminPanel" class="hidden min-h-screen bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- 統計卡片 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">總新聞數</dt>
-                                    <dd class="text-lg font-medium text-gray-900" id="totalNews">0</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">總用戶數</dt>
-                                    <dd class="text-lg font-medium text-gray-900" id="totalUsers">0</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">今日瀏覽</dt>
-                                    <dd class="text-lg font-medium text-gray-900" id="todayViews">0</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- 登入表單 -->
+    <div x-show="!isLoggedIn && !showForcePasswordChange" class="min-h-screen flex items-center justify-center">
+        <div class="max-w-md w-full space-y-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-gray-900">管理員登入</h2>
             </div>
-
-            <!-- 新聞管理 -->
-            <div class="bg-white shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">最新消息管理</h3>
-                        <button id="addNewsBtn" class="bg-actc-orange hover:bg-actc-orange-dark text-white px-4 py-2 rounded-md transition-colors">
-                            新增消息
-                        </button>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">標題</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分類</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">發布日期</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">附件</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="newsTableBody" class="bg-white divide-y divide-gray-200">
-                                <!-- 新聞列表將由 JavaScript 動態生成 -->
-                            </tbody>
-                        </table>
-                    </div>
+            <form @submit.prevent="login" class="mt-8 space-y-6">
+                <div>
+                    <input x-model="loginForm.username" type="text" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                           placeholder="使用者帳號">
                 </div>
-            </div>
-
-            <!-- 活動課程管理 -->
-            <div class="bg-white shadow rounded-lg mt-8">
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">活動課程管理</h3>
-                        <button id="addEventBtn" class="bg-actc-orange hover:bg-actc-orange-dark text-white px-4 py-2 rounded-md transition-colors">
-                            新增活動
-                        </button>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">標題</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">類型</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">活動日期</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">地點</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">連結</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="eventsTableBody" class="bg-white divide-y divide-gray-200">
-                                <!-- 活動列表將由 JavaScript 動態生成 -->
-                            </tbody>
-                        </table>
-                    </div>
+                <div>
+                    <input x-model="loginForm.password" type="password" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                           placeholder="密碼">
                 </div>
-            </div>
+                <div>
+                    <button type="submit" :disabled="isLoading"
+                            class="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 disabled:opacity-50">
+                        <span x-show="!isLoading">登入</span>
+                        <span x-show="isLoading">登入中...</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- 新增/編輯新聞模態框 -->
-    <div id="newsModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 modal-overlay">
-        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white slide-in">
-            <div class="mt-3">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-900" id="modalTitle">新增消息</h3>
-                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+    <!-- 管理後台 -->
+    <div x-show="isLoggedIn && !showForcePasswordChange">
+        <!-- 導航列 -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <h1 class="text-xl font-bold">ACTC 管理後台</h1>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-600" x-text="`歡迎, ${currentUser.username} (${currentUser.role})`"></span>
+                        <button @click="logout" class="bg-red-500 text-white px-4 py-2 rounded text-sm">登出</button>
+                    </div>
                 </div>
-                
-                <form id="newsForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">標題 <span class="text-red-500">*</span></label>
-                            <input type="text" id="newsTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" required maxlength="200">
-                            <p class="text-xs text-gray-500 mt-1">最多200字元</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
-                            <select id="newsCategory" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input">
-                                <option value="聯盟動態">聯盟動態</option>
-                                <option value="活動預告">活動預告</option>
-                                <option value="技術分享">技術分享</option>
-                                <option value="一般">一般</option>
-                            </select>
+            </div>
+        </nav>
+        
+        <!-- 側邊選單 -->
+        <div class="flex">
+            <aside class="w-64 bg-gray-800 min-h-screen">
+                <nav class="mt-8">
+                    <template x-if="currentUser.role === 'admin'">
+                        <a @click="currentTab = 'users'" 
+                           :class="currentTab === 'users' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
+                           class="flex items-center px-6 py-3 cursor-pointer">
+                            <span>使用者管理</span>
+                        </a>
+                    </template>
+                    <a @click="currentTab = 'news'" 
+                       :class="currentTab === 'news' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
+                       class="flex items-center px-6 py-3 cursor-pointer">
+                        <span>最新消息管理</span>
+                    </a>
+                    <a @click="currentTab = 'events'" 
+                       :class="currentTab === 'events' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
+                       class="flex items-center px-6 py-3 cursor-pointer">
+                        <span>活動課程管理</span>
+                    </a>
+                    <a @click="currentTab = 'corporate-members'" 
+                       :class="currentTab === 'corporate-members' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
+                       class="flex items-center px-6 py-3 cursor-pointer">
+                        <span>企業會員管理</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- 主要內容區域 -->
+            <main class="flex-1 p-8">
+                <!-- 使用者管理 -->
+                <div x-show="currentTab === 'users'" x-data="usersTab()">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">使用者管理</h2>
+                        <button @click="showCreateModal = true" class="bg-blue-600 text-white px-4 py-2 rounded">
+                            新增使用者
+                        </button>
+                    </div>
+
+                    <!-- 使用者列表 -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">使用者名稱</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">電子郵件</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">角色</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">狀態</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">最後登入</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <template x-for="user in users" :key="user._id">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900" x-text="user.username"></div>
+                                            <div class="text-sm text-gray-500" x-text="user.fullName || '-'"></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="user.email || '-'"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span :class="user.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'"
+                                                  class="px-2 py-1 text-xs font-semibold rounded-full" x-text="user.role"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span :class="user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                                  class="px-2 py-1 text-xs font-semibold rounded-full" x-text="user.isActive ? '啟用' : '停用'"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" 
+                                            x-text="user.lastLogin ? new Date(user.lastLogin).toLocaleString() : '-'"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                            <button @click="editUser(user)" class="text-blue-600 hover:text-blue-900">編輯</button>
+                                            <button @click="toggleUserStatus(user)" 
+                                                    :class="user.isActive ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'"
+                                                    x-text="user.isActive ? '停用' : '啟用'"></button>
+                                            <button @click="resetPassword(user)" class="text-yellow-600 hover:text-yellow-900">重設密碼</button>
+                                            <button @click="deleteUser(user)" class="text-red-600 hover:text-red-900">刪除</button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 新增/編輯使用者 Modal -->
+                    <div x-show="showCreateModal || showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+                            <h3 class="text-lg font-semibold mb-4" x-text="showEditModal ? '編輯使用者' : '新增使用者'"></h3>
+                            <form @submit.prevent="showEditModal ? updateUser() : createUser()">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium mb-2">使用者名稱</label>
+                                    <input type="text" x-model="userForm.username" required 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium mb-2">電子郵件</label>
+                                    <input type="email" x-model="userForm.email" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium mb-2">全名</label>
+                                    <input type="text" x-model="userForm.fullName" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium mb-2">角色</label>
+                                    <select x-model="userForm.role" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                        <option value="user">一般使用者</option>
+                                        <option value="admin">管理員</option>
+                                    </select>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                                        <span x-text="showEditModal ? '更新' : '創建'"></span>
+                                    </button>
+                                    <button type="button" @click="closeModal" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">
+                                        取消
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">描述 <span class="text-red-500">*</span></label>
-                        <textarea id="newsDescription" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" required maxlength="1000"></textarea>
-                        <p class="text-xs text-gray-500 mt-1">最多1000字元</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">發布日期 <span class="text-red-500">*</span></label>
-                            <input type="date" id="newsDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">活動連結 (可選)</label>
-                            <input type="url" id="newsLink" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" placeholder="https://example.com">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">圖片上傳 (最多3張)</label>
-                        <div class="space-y-2">
-                            <input type="file" name="images[]" accept="image/jpeg,image/png,image/jpg" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" multiple>
-                            <div class="text-xs text-gray-500 space-y-1">
-                                <p>• 支援格式：JPG、PNG</p>
-                                <p>• 每張圖片最大5MB</p>
-                                <p>• 建議尺寸：1200x800像素</p>
+                </div>
+
+                <!-- 最新消息管理 -->
+                <div x-show="currentTab === 'news'">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="text-center">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-4">最新消息管理</h2>
+                            <p class="text-gray-600 mb-8">管理網站的最新消息、文章和公告</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <!-- 統計卡片 -->
+                                <div class="bg-blue-50 p-6 rounded-lg">
+                                    <div class="text-3xl font-bold text-blue-600 mb-2" id="newsStatsPublished">-</div>
+                                    <div class="text-sm text-gray-600">已發布新聞</div>
+                                </div>
+                                <div class="bg-yellow-50 p-6 rounded-lg">
+                                    <div class="text-3xl font-bold text-yellow-600 mb-2" id="newsStatsDraft">-</div>
+                                    <div class="text-sm text-gray-600">草稿新聞</div>
+                                </div>
+                                <div class="bg-green-50 p-6 rounded-lg">
+                                    <div class="text-3xl font-bold text-green-600 mb-2" id="newsStatsViews">-</div>
+                                    <div class="text-sm text-gray-600">總瀏覽次數</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                                <a href="/admin/news" 
+                                   class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    進入新聞管理
+                                </a>
+                                
+                                <button onclick="loadNewsQuickStats()" 
+                                        class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    重新載入統計
+                                </button>
+                            </div>
+                            
+                            <div class="mt-8 text-left">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">功能說明</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h4 class="font-medium text-gray-900 mb-2">📝 內容管理</h4>
+                                        <ul class="text-sm text-gray-600 space-y-1">
+                                            <li>• 創建和編輯新聞文章</li>
+                                            <li>• 上傳圖片和附件檔案</li>
+                                            <li>• 嵌入 YouTube/Instagram 影片</li>
+                                            <li>• 設定發布時間和狀態</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h4 class="font-medium text-gray-900 mb-2">📊 數據追蹤</h4>
+                                        <ul class="text-sm text-gray-600 space-y-1">
+                                            <li>• Google Analytics 整合</li>
+                                            <li>• 瀏覽次數統計</li>
+                                            <li>• 用戶互動分析</li>
+                                            <li>• 熱門文章追蹤</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h4 class="font-medium text-gray-900 mb-2">🔧 批量操作</h4>
+                                        <ul class="text-sm text-gray-600 space-y-1">
+                                            <li>• 批量發布/設為草稿</li>
+                                            <li>• 批量刪除文章</li>
+                                            <li>• 標籤管理</li>
+                                            <li>• 精選文章設定</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h4 class="font-medium text-gray-900 mb-2">🔍 搜尋篩選</h4>
+                                        <ul class="text-sm text-gray-600 space-y-1">
+                                            <li>• 標題/內容搜尋</li>
+                                            <li>• 狀態篩選</li>
+                                            <li>• 日期範圍篩選</li>
+                                            <li>• 排序功能</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">附件檔案 (可選)</label>
-                        <input type="file" id="newsFile" accept=".pptx,.pdf,.docx" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input">
-                        <div class="text-xs text-gray-500 mt-1">
-                            <p>支援格式：PPTX、PDF、DOCX，最大5MB</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 pt-4 border-t">
-                        <button type="button" id="cancelNewsBtn" class="btn-secondary">取消</button>
-                        <button type="submit" class="btn-primary">儲存</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- 新增/編輯活動模態框 -->
-    <div id="eventModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 modal-overlay">
-        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white slide-in">
-            <div class="mt-3">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-900" id="eventModalTitle">新增活動</h3>
-                    <button id="closeEventModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
                 </div>
-                
-                <form id="eventForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">標題 <span class="text-red-500">*</span></label>
-                            <input type="text" id="eventTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" required maxlength="200">
-                            <p class="text-xs text-gray-500 mt-1">最多200字元</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">類型 <span class="text-red-500">*</span></label>
-                            <select id="eventType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" required>
-                                <option value="">請選擇類型</option>
-                                <option value="meetup">聚會</option>
-                                <option value="workshop">工作坊</option>
-                                <option value="course">課程</option>
-                                <option value="others">其他</option>
-                            </select>
+
+                <!-- 活動課程管理 -->
+                <div x-show="currentTab === 'events'">
+                    <h2 class="text-2xl font-bold mb-6">活動課程管理</h2>
+                <div class="bg-white p-6 rounded-lg shadow">
+                        <p class="text-gray-600">活動課程管理功能開發中...</p>
+                    </div>
+                </div>
+
+                <!-- 企業會員管理 -->
+                <div x-show="currentTab === 'corporate-members'">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="text-center">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-4">企業會員管理</h2>
+                            <p class="text-gray-600 mb-8">管理企業會員資料，控制前端顯示</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <!-- 統計卡片 -->
+                                <div class="bg-purple-50 p-6 rounded-lg">
+                                    <div class="text-3xl font-bold text-purple-600 mb-2" id="memberStatsTotal">-</div>
+                                    <div class="text-sm text-gray-600">總企業會員</div>
+                                </div>
+                                <div class="bg-green-50 p-6 rounded-lg">
+                                    <div class="text-3xl font-bold text-green-600 mb-2" id="memberStatsActive">-</div>
+                                    <div class="text-sm text-gray-600">啟用會員</div>
+                                </div>
+                                <div class="bg-blue-50 p-6 rounded-lg">
+                                    <div class="text-3xl font-bold text-blue-600 mb-2" id="memberStatsDisplayed">-</div>
+                                    <div class="text-sm text-gray-600">前端顯示</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                                <a href="/admin/corporate-members" 
+                                   class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                    進入企業會員管理
+                                </a>
+
+                                <button onclick="loadMemberQuickStats()"
+                                        class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    重新載入統計
+                                </button>
+                            </div>
+                            
+                            <!-- 功能說明 -->
+                            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-900 mb-2">✨ 主要功能</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• 新增、編輯、刪除企業會員</li>
+                                        <li>• 會員類型管理（白金、金級、銀級、銅級）</li>
+                                        <li>• 公司Logo上傳</li>
+                                        <li>• 聯絡資訊管理</li>
+                                        <li>• 顯示順序控制</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-900 mb-2">🎛️ 顯示控制</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• 啟用/停用企業會員</li>
+                                        <li>• 前端顯示/隱藏控制</li>
+                                        <li>• 批量操作功能</li>
+                                        <li>• 會員類型篩選</li>
+                                        <li>• 搜尋和排序</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">描述 <span class="text-red-500">*</span></label>
-                        <textarea id="eventDescription" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" required maxlength="1000"></textarea>
-                        <p class="text-xs text-gray-500 mt-1">最多1000字元</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">活動日期 <span class="text-red-500">*</span></label>
-                            <input type="datetime-local" id="eventDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">地點 <span class="text-red-500">*</span></label>
-                            <input type="text" id="eventLocation" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" required maxlength="200">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">線上連結 (可選)</label>
-                        <input type="url" id="eventLink" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange form-input" placeholder="https://discord.gg/... 或 https://teams.microsoft.com/...">
-                        <div class="text-xs text-gray-500 mt-1">
-                            <p>支援 Discord、Teams 或其他線上會議連結</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3 pt-4 border-t">
-                        <button type="button" id="cancelEventBtn" class="btn-secondary">取消</button>
-                        <button type="submit" class="btn-primary">儲存</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </main>
         </div>
     </div>
 
     <script>
-        // 檢查登入狀態
-        function checkAuth() {
-            const token = localStorage.getItem('adminToken');
-            if (token) {
-                showAdminPanel();
-                loadDashboardData();
-            } else {
-                showLoginForm();
-            }
-        }
+        function adminApp() {
+            return {
+                isLoggedIn: false,
+                isLoading: false,
+                currentUser: null,
+                currentTab: 'users',
+                showForcePasswordChange: false,
+                newPassword: '',
+                confirmPassword: '',
+                loginForm: {
+                    username: '',
+                    password: ''
+                },
 
-        // 顯示登入表單
-        function showLoginForm() {
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('adminPanel').classList.add('hidden');
-        }
+                async init() {
+                    await this.checkAuth();
+                },
 
-        // 顯示管理後台
-        function showAdminPanel() {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('adminPanel').classList.remove('hidden');
-        }
+                async checkAuth() {
+                    const token = localStorage.getItem('adminToken');
+                    if (!token) return;
 
-        // 登入處理 - 連接後端API
-        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+                    try {
+                        const response = await fetch('/api/auth/verify', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
 
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.currentUser = data.user;
+                            this.isLoggedIn = true;
+                            
+                            if (data.user.isFirstLogin) {
+                                this.showForcePasswordChange = true;
+                            }
+                        } else {
+                            localStorage.removeItem('adminToken');
+                        }
+                    } catch (error) {
+                        console.error('Auth check failed:', error);
+                        localStorage.removeItem('adminToken');
+                    }
+                },
+
+                async login() {
+                    this.isLoading = true;
             try {
-                const response = await fetch('http://localhost:5001/api/auth/login', {
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username, password })
+                            body: JSON.stringify(this.loginForm)
+                });
+
+                        const data = await response.json();
+
+                if (response.ok) {
+                            localStorage.setItem('adminToken', data.token);
+                            this.currentUser = data.user;
+                            this.isLoggedIn = true;
+                            
+                            if (data.user.isFirstLogin) {
+                                this.showForcePasswordChange = true;
+                            }
+                            
+                            this.loginForm = { username: '', password: '' };
+                } else {
+                            alert('登入失敗：' + data.message);
+                }
+            } catch (error) {
+                alert('登入錯誤：' + error.message);
+                    } finally {
+                        this.isLoading = false;
+                    }
+                },
+
+                async forceChangePassword() {
+                    if (this.newPassword !== this.confirmPassword) {
+                        alert('密碼確認不符');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/auth/force-change-password', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            },
+                            body: JSON.stringify({
+                                newPassword: this.newPassword
+                            })
+                        });
+
+                        if (response.ok) {
+                            this.showForcePasswordChange = false;
+                            this.currentUser.isFirstLogin = false;
+                            this.newPassword = '';
+                            this.confirmPassword = '';
+                            alert('密碼修改成功！');
+                        } else {
+                            const data = await response.json();
+                            alert('密碼修改失敗：' + data.message);
+                        }
+                    } catch (error) {
+                        alert('密碼修改錯誤：' + error.message);
+                    }
+                },
+
+                logout() {
+                    localStorage.removeItem('adminToken');
+                    this.isLoggedIn = false;
+                    this.currentUser = null;
+                    this.currentTab = 'users';
+                }
+            }
+        }
+
+        function usersTab() {
+            return {
+                users: [],
+                showCreateModal: false,
+                showEditModal: false,
+                editingUser: null,
+                userForm: {
+                    username: '',
+                    email: '',
+                    fullName: '',
+                    role: 'user'
+                },
+
+                async init() {
+                    await this.loadUsers();
+                },
+
+                async loadUsers() {
+                    try {
+                        const response = await fetch('/api/users', {
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.users = data.users;
+                        }
+                    } catch (error) {
+                        console.error('Load users failed:', error);
+                    }
+                },
+
+                async createUser() {
+                    try {
+                        const response = await fetch('/api/users', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            },
+                            body: JSON.stringify(this.userForm)
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            await this.loadUsers();
+                            this.closeModal();
+                            alert('使用者創建成功！預設密碼為 "user"');
+                        } else {
+                            alert('創建失敗：' + data.message);
+                        }
+                    } catch (error) {
+                        alert('創建錯誤：' + error.message);
+                    }
+                },
+
+                editUser(user) {
+                    this.editingUser = user;
+                    this.userForm = {
+                        username: user.username,
+                        email: user.email || '',
+                        fullName: user.fullName || '',
+                        role: user.role
+                    };
+                    this.showEditModal = true;
+                },
+
+                async updateUser() {
+                    try {
+                        const response = await fetch(`/api/users/${this.editingUser._id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            },
+                            body: JSON.stringify(this.userForm)
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            await this.loadUsers();
+                            this.closeModal();
+                            alert('使用者更新成功！');
+            } else {
+                            alert('更新失敗：' + data.message);
+                        }
+                    } catch (error) {
+                        alert('更新錯誤：' + error.message);
+                    }
+                },
+
+                async toggleUserStatus(user) {
+                    if (!confirm(`確定要${user.isActive ? '停用' : '啟用'}此使用者嗎？`)) return;
+
+                    try {
+                        const response = await fetch(`/api/users/${user._id}/toggle-status`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            await this.loadUsers();
+                        }
+                    } catch (error) {
+                        alert('操作失敗：' + error.message);
+                    }
+                },
+
+                async resetPassword(user) {
+                    if (!confirm('確定要重設此使用者的密碼嗎？密碼將重設為 "user"')) return;
+
+                    try {
+                        const response = await fetch(`/api/users/${user._id}/reset-password`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            alert('密碼重設成功！新密碼為 "user"');
+                        }
+                    } catch (error) {
+                        alert('密碼重設失敗：' + error.message);
+                    }
+                },
+
+                async deleteUser(user) {
+                    if (!confirm(`確定要刪除使用者 "${user.username}" 嗎？此操作無法復原！`)) return;
+
+                    try {
+                        const response = await fetch(`/api/users/${user._id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            await this.loadUsers();
+                            alert('使用者刪除成功！');
+                        }
+                    } catch (error) {
+                        alert('刪除失敗：' + error.message);
+                    }
+                },
+
+                closeModal() {
+                    this.showCreateModal = false;
+                    this.showEditModal = false;
+                    this.editingUser = null;
+                    this.userForm = {
+                        username: '',
+                        email: '',
+                        fullName: '',
+                        role: 'user'
+                    };
+                }
+            }
+        }
+        // 載入新聞快速統計
+        async function loadNewsQuickStats() {
+            try {
+                const token = localStorage.getItem('adminToken');
+                if (!token) return;
+
+                const response = await fetch('/api/news/admin?limit=1', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    localStorage.setItem('adminToken', data.token);
-                    localStorage.setItem('adminUsername', username);
-                    document.getElementById('adminUsername').textContent = username;
-                    showAdminPanel();
-                    loadDashboardData();
-                    alert('登入成功！歡迎使用管理後台');
+                    const stats = data.stats || {};
+                    
+                    document.getElementById('newsStatsPublished').textContent = stats.published?.count || 0;
+                    document.getElementById('newsStatsDraft').textContent = stats.draft?.count || 0;
+                    document.getElementById('newsStatsViews').textContent = (stats.published?.totalViews || 0) + (stats.draft?.totalViews || 0);
                 } else {
-                    const errorData = await response.json();
-                    alert('登入失敗：' + errorData.message);
+                    console.error('Failed to load news stats');
                 }
             } catch (error) {
-                console.error('登入錯誤:', error);
-                alert('登入時發生錯誤，請檢查後端服務器是否運行');
-            }
-        });
-
-        // 登出處理
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('adminToken');
-            showLoginForm();
-        });
-
-        // 載入儀表板資料 - 連接後端API
-        async function loadDashboardData() {
-            try {
-                // 載入新聞數據
-                const newsResponse = await fetch('http://localhost:5001/api/news');
-                if (newsResponse.ok) {
-                    const newsData = await newsResponse.json();
-                    document.getElementById('totalNews').textContent = newsData.length;
-                    renderNewsTable(newsData);
-                } else {
-                    console.error('載入新聞失敗');
-                }
-
-                // 載入統計數據（簡化版本）
-                document.getElementById('totalUsers').textContent = '1'; // 預設管理員帳號
-                document.getElementById('todayViews').textContent = '0'; // 暫時設為0
-            } catch (error) {
-                console.error('載入資料錯誤:', error);
-                alert('載入數據時發生錯誤，請檢查後端服務器是否運行');
+                console.error('Error loading news stats:', error);
             }
         }
 
-        // 渲染新聞表格
-        function renderNewsTable(news) {
-            const tbody = document.getElementById('newsTableBody');
-            tbody.innerHTML = news.map(item => `
-                <tr class="table-row-hover fade-in">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <div class="max-w-xs truncate" title="${item.title}">${item.title}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span class="category-badge">
-                            ${item.category || '一般'}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${new Date(item.date).toLocaleDateString('zh-TW')}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${item.file ? 
-                            `<span class="file-badge" title="${item.file}">
-                                <svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 012 2z" />
-                                </svg>
-                                ${item.file.split('/').pop().substring(0, 15)}${item.file.split('/').pop().length > 15 ? '...' : ''}
-                            </span>` : 
-                            '<span class="text-gray-400">無附件</span>'
-                        }
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div class="flex space-x-2">
-                            <button onclick="editNews('${item._id}')" class="btn-primary" title="編輯">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                            </button>
-                            <button onclick="deleteNews('${item._id}')" class="btn-danger" title="刪除">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // 新增新聞
-        document.getElementById('addNewsBtn').addEventListener('click', () => {
-            document.getElementById('modalTitle').textContent = '新增消息';
-            document.getElementById('newsForm').reset();
-            // 設置預設日期為今天
-            document.getElementById('newsDate').value = new Date().toISOString().split('T')[0];
-            // 清理現有的圖片和附件信息
-            const existingInfo = document.querySelectorAll('.bg-gray-100');
-            existingInfo.forEach(info => info.remove());
-            document.getElementById('newsModal').classList.remove('hidden');
-        });
-
-        // 取消新增/編輯
-        document.getElementById('cancelNewsBtn').addEventListener('click', () => {
-            document.getElementById('newsModal').classList.add('hidden');
-            // 清理現有的圖片和附件信息
-            const existingInfo = document.querySelectorAll('.bg-gray-100');
-            existingInfo.forEach(info => info.remove());
-        });
-
-        // 提交新聞表單 - 連接後端API
-        document.getElementById('newsForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const title = document.getElementById('newsTitle').value;
-            const description = document.getElementById('newsDescription').value;
-            const date = document.getElementById('newsDate').value;
-            const category = document.getElementById('newsCategory').value || '一般';
-            const link = document.getElementById('newsLink').value;
-
-            if (!title || !description) {
-                alert('請填寫標題和描述');
-                return;
-            }
-
-            const editId = document.getElementById('newsForm').getAttribute('data-edit-id');
-            const isEdit = editId !== null;
-
+        // 載入企業會員快速統計
+        async function loadMemberQuickStats() {
             try {
-                // 創建 FormData 對象來處理文件上傳
-                const formData = new FormData();
-                formData.append('title', title);
-                formData.append('description', description);
-                formData.append('date', date);
-                formData.append('category', category);
-                formData.append('link', link);
+                const token = localStorage.getItem('adminToken');
+                if (!token) return;
 
-                // 處理圖片文件
-                const imageFiles = document.querySelector('input[name="images[]"]').files;
-                if (imageFiles.length > 0) {
-                    // 限制最多3張圖片
-                    const maxImages = Math.min(imageFiles.length, 3);
-                    for (let i = 0; i < maxImages; i++) {
-                        formData.append('images', imageFiles[i]);
-                    }
-                }
-
-                // 處理附件文件
-                const fileInput = document.getElementById('newsFile');
-                if (fileInput.files.length > 0) {
-                    formData.append('file', fileInput.files[0]);
-                }
-
-                const url = isEdit ? `http://localhost:5001/api/news/${editId}` : 'http://localhost:5001/api/news';
-                const method = isEdit ? 'PUT' : 'POST';
-                
-                const response = await fetch(url, {
-                    method: method,
+                const response = await fetch('/api/corporate-members/stats', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    },
-                    body: formData
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
                 if (response.ok) {
-                    const result = await response.json();
-                    document.getElementById('newsModal').classList.add('hidden');
-                    document.getElementById('newsForm').reset();
-                    document.getElementById('newsForm').removeAttribute('data-edit-id');
-                    // 清理現有的圖片和附件信息
-                    const existingInfo = document.querySelectorAll('.bg-gray-100');
-                    existingInfo.forEach(info => info.remove());
-                    loadDashboardData();
-                    alert(isEdit ? '消息更新成功！' : '消息新增成功！');
+                    const data = await response.json();
+                    const stats = data.stats || {};
+                    
+                    document.getElementById('memberStatsTotal').textContent = stats.total || 0;
+                    document.getElementById('memberStatsActive').textContent = stats.active || 0;
+                    document.getElementById('memberStatsDisplayed').textContent = stats.displayed || 0;
                 } else {
-                    const errorData = await response.json();
-                    alert((isEdit ? '更新' : '新增') + '失敗：' + errorData.message);
+                    console.error('Failed to load member stats');
                 }
             } catch (error) {
-                console.error((isEdit ? '更新' : '新增') + '新聞錯誤:', error);
-                alert((isEdit ? '更新' : '新增') + '新聞時發生錯誤，請檢查後端服務器是否運行');
-            }
-        });
-
-        // 編輯新聞
-        async function editNews(id) {
-            try {
-                // 獲取新聞數據
-                const response = await fetch(`http://localhost:5001/api/news/${id}`);
-                if (response.ok) {
-                    const news = await response.json();
-                    
-                    // 填充表單
-                    document.getElementById('newsTitle').value = news.title;
-                    document.getElementById('newsDescription').value = news.description;
-                    document.getElementById('newsDate').value = news.date ? new Date(news.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-                    document.getElementById('newsCategory').value = news.category || '一般';
-                    document.getElementById('newsLink').value = news.link || '';
-                    
-                    // 顯示現有圖片信息（僅供參考，編輯時需要重新上傳）
-                    if (news.images && news.images.length > 0) {
-                        const imageInfo = document.createElement('div');
-                        imageInfo.className = 'mb-2 p-2 bg-gray-100 rounded text-sm text-gray-600';
-                        imageInfo.innerHTML = `現有圖片：${news.images.length}張<br>編輯時請重新上傳圖片`;
-                        
-                        const imageInput = document.querySelector('input[name="images[]"]');
-                        if (imageInput && imageInput.parentNode) {
-                            imageInput.parentNode.insertBefore(imageInfo, imageInput);
-                        }
-                    }
-                    
-                    // 顯示現有附件信息
-                    if (news.file) {
-                        const fileInfo = document.createElement('div');
-                        fileInfo.className = 'mb-2 p-2 bg-gray-100 rounded text-sm text-gray-600';
-                        fileInfo.innerHTML = `現有附件：${news.file.split('/').pop()}<br>編輯時請重新上傳附件`;
-                        
-                        const fileInput = document.getElementById('newsFile');
-                        if (fileInput && fileInput.parentNode) {
-                            fileInput.parentNode.insertBefore(fileInfo, fileInput);
-                        }
-                    }
-                    
-                    // 設置編輯模式
-                    document.getElementById('modalTitle').textContent = '編輯消息';
-                    document.getElementById('newsForm').setAttribute('data-edit-id', id);
-                    // 清理現有的圖片和附件信息
-                    const existingInfo = document.querySelectorAll('.bg-gray-100');
-                    existingInfo.forEach(info => info.remove());
-                    document.getElementById('newsModal').classList.remove('hidden');
-                } else {
-                    alert('獲取新聞數據失敗');
-                }
-            } catch (error) {
-                console.error('編輯新聞錯誤:', error);
-                alert('編輯新聞時發生錯誤');
+                console.error('Error loading member stats:', error);
             }
         }
 
-        // 刪除新聞 - 連接後端API
-        async function deleteNews(id) {
-            if (confirm('確定要刪除這則新聞嗎？')) {
-                try {
-                                    const response = await fetch(`http://localhost:5001/api/news/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    }
-                });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        alert('消息刪除成功！');
-                        loadDashboardData();
-                    } else {
-                        const errorData = await response.json();
-                        alert('刪除失敗：' + errorData.message);
-                    }
-                } catch (error) {
-                    console.error('刪除新聞錯誤:', error);
-                    alert('刪除新聞時發生錯誤，請檢查後端服務器是否運行');
-                }
-            }
-        }
-
-        // 關閉模態框
-        document.getElementById('closeModalBtn').addEventListener('click', () => {
-            document.getElementById('newsModal').classList.add('hidden');
-            // 清理現有的圖片和附件信息
-            const existingInfo = document.querySelectorAll('.bg-gray-100');
-            existingInfo.forEach(info => info.remove());
+        // 頁面載入時自動載入統計
+        document.addEventListener('DOMContentLoaded', function() {
+            // 延遲載入統計，確保用戶已登入
+            setTimeout(loadNewsQuickStats, 2000);
+            setTimeout(loadMemberQuickStats, 2500);
         });
-
-        // 活動管理功能
-        let currentEvents = [];
-
-        // 載入活動數據
-        async function loadEventsData() {
-            try {
-                const response = await fetch('http://localhost:5001/api/events');
-                if (response.ok) {
-                    const eventsData = await response.json();
-                    currentEvents = eventsData;
-                    // 更新活動統計 (如果有 totalEvents 元素)
-                    const totalEventsElement = document.getElementById('totalEvents');
-                    if (totalEventsElement) {
-                        totalEventsElement.textContent = eventsData.length;
-                    }
-                    renderEventsTable(eventsData);
-                } else {
-                    console.error('載入活動失敗');
-                }
-            } catch (error) {
-                console.error('載入活動錯誤:', error);
-                alert('載入活動時發生錯誤，請檢查後端服務器是否運行');
-            }
-        }
-
-        // 渲染活動表格
-        function renderEventsTable(events) {
-            const tbody = document.getElementById('eventsTableBody');
-            const typeLabels = {
-                'meetup': '聚會',
-                'workshop': '工作坊',
-                'course': '課程',
-                'others': '其他'
-            };
-
-            const typeColors = {
-                'meetup': 'bg-blue-100 text-blue-800',
-                'workshop': 'bg-green-100 text-green-800',
-                'course': 'bg-purple-100 text-purple-800',
-                'others': 'bg-gray-100 text-gray-800'
-            };
-
-            tbody.innerHTML = events.map(item => `
-                <tr class="table-row-hover fade-in">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <div class="max-w-xs truncate" title="${item.title}">${item.title}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeColors[item.type] || typeColors['others']}">
-                            ${typeLabels[item.type] || item.type}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${new Date(item.date).toLocaleDateString('zh-TW', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div class="max-w-xs truncate" title="${item.location}">${item.location}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${item.link ? 
-                            `<a href="${item.link}" target="_blank" class="text-blue-600 hover:text-blue-800" title="${item.link}">
-                                ${item.link.includes('discord') ? '<i class="fab fa-discord"></i>' : 
-                                  item.link.includes('teams') ? '<i class="fab fa-microsoft"></i>' : 
-                                  '<i class="fas fa-external-link-alt"></i>'}
-                            </a>` : 
-                            '<span class="text-gray-400">無連結</span>'
-                        }
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div class="flex space-x-2">
-                            <button onclick="editEvent('${item._id}')" class="btn-primary" title="編輯">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                            </button>
-                            <button onclick="deleteEvent('${item._id}')" class="btn-danger" title="刪除">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // 新增活動
-        document.getElementById('addEventBtn').addEventListener('click', () => {
-            document.getElementById('eventModalTitle').textContent = '新增活動';
-            document.getElementById('eventForm').reset();
-            document.getElementById('eventModal').classList.remove('hidden');
-        });
-
-        // 取消新增/編輯活動
-        document.getElementById('cancelEventBtn').addEventListener('click', () => {
-            document.getElementById('eventModal').classList.add('hidden');
-        });
-
-        document.getElementById('closeEventModalBtn').addEventListener('click', () => {
-            document.getElementById('eventModal').classList.add('hidden');
-        });
-
-        // 提交活動表單
-        document.getElementById('eventForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const title = document.getElementById('eventTitle').value;
-            const type = document.getElementById('eventType').value;
-            const description = document.getElementById('eventDescription').value;
-            const date = document.getElementById('eventDate').value;
-            const location = document.getElementById('eventLocation').value;
-            const link = document.getElementById('eventLink').value;
-
-            if (!title || !type || !description || !date || !location) {
-                alert('請填寫所有必填欄位');
-                return;
-            }
-
-            const editId = document.getElementById('eventForm').getAttribute('data-edit-id');
-            const isEdit = editId !== null;
-
-            try {
-                const eventData = {
-                    title,
-                    type,
-                    description,
-                    date,
-                    location,
-                    link: link || ''
-                };
-
-                const url = isEdit ? `http://localhost:5001/api/events/${editId}` : 'http://localhost:5001/api/events';
-                const method = isEdit ? 'PUT' : 'POST';
-                
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    },
-                    body: JSON.stringify(eventData)
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    document.getElementById('eventModal').classList.add('hidden');
-                    document.getElementById('eventForm').reset();
-                    document.getElementById('eventForm').removeAttribute('data-edit-id');
-                    loadEventsData();
-                    alert(isEdit ? '活動更新成功！' : '活動新增成功！');
-                } else {
-                    const errorData = await response.json();
-                    alert((isEdit ? '更新' : '新增') + '失敗：' + errorData.message);
-                }
-            } catch (error) {
-                console.error((isEdit ? '更新' : '新增') + '活動錯誤:', error);
-                alert((isEdit ? '更新' : '新增') + '活動時發生錯誤，請檢查後端服務器是否運行');
-            }
-        });
-
-        // 編輯活動
-        async function editEvent(id) {
-            try {
-                const response = await fetch(`http://localhost:5001/api/events/${id}`);
-                if (response.ok) {
-                    const event = await response.json();
-                    
-                    document.getElementById('eventTitle').value = event.title;
-                    document.getElementById('eventType').value = event.type;
-                    document.getElementById('eventDescription').value = event.description;
-                    
-                    // 格式化日期為 datetime-local 格式
-                    const eventDate = new Date(event.date);
-                    const year = eventDate.getFullYear();
-                    const month = String(eventDate.getMonth() + 1).padStart(2, '0');
-                    const day = String(eventDate.getDate()).padStart(2, '0');
-                    const hours = String(eventDate.getHours()).padStart(2, '0');
-                    const minutes = String(eventDate.getMinutes()).padStart(2, '0');
-                    document.getElementById('eventDate').value = `${year}-${month}-${day}T${hours}:${minutes}`;
-                    
-                    document.getElementById('eventLocation').value = event.location;
-                    document.getElementById('eventLink').value = event.link || '';
-                    
-                    document.getElementById('eventModalTitle').textContent = '編輯活動';
-                    document.getElementById('eventForm').setAttribute('data-edit-id', id);
-                    document.getElementById('eventModal').classList.remove('hidden');
-                } else {
-                    alert('獲取活動數據失敗');
-                }
-            } catch (error) {
-                console.error('編輯活動錯誤:', error);
-                alert('編輯活動時發生錯誤');
-            }
-        }
-
-        // 刪除活動
-        async function deleteEvent(id) {
-            if (confirm('確定要刪除這個活動嗎？')) {
-                try {
-                    const response = await fetch(`http://localhost:5001/api/events/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                        }
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        alert('活動刪除成功！');
-                        loadEventsData();
-                    } else {
-                        const errorData = await response.json();
-                        alert('刪除失敗：' + errorData.message);
-                    }
-                } catch (error) {
-                    console.error('刪除活動錯誤:', error);
-                    alert('刪除活動時發生錯誤，請檢查後端服務器是否運行');
-                }
-            }
-        }
-
-        // 修改載入儀表板資料的函數，增加載入活動數據
-        const originalLoadDashboardData = loadDashboardData;
-        loadDashboardData = async function() {
-            await originalLoadDashboardData();
-            await loadEventsData();
-        };
-
-        // 頁面載入時檢查登入狀態
-        document.addEventListener('DOMContentLoaded', checkAuth);
     </script>
 </body>
 </html>

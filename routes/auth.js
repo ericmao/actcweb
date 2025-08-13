@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const auth = require('../middleware/auth');
+const { auth, adminAuth } = require('../middleware/adminAuth');
 
 const router = express.Router();
 
@@ -26,6 +26,13 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        // 檢查用戶是否被停用
+        if (!user.isActive) {
+            return res.status(401).json({
+                message: 'Account is suspended. Please contact administrator.'
+            });
+        }
+
         // 驗證密碼
         const isPasswordValid = await user.comparePassword(password);
         if (!isPasswordValid) {
@@ -34,9 +41,17 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        // 更新最後登入時間
+        user.lastLogin = new Date();
+        await user.save();
+
         // 生成 JWT token
         const token = jwt.sign(
-            { userId: user._id, username: user.username },
+            { 
+                userId: user._id, 
+                username: user.username,
+                role: user.role 
+            },
             process.env.JWT_SECRET || 'actc_super_secret_jwt_key_2025',
             { expiresIn: '24h' }
         );
@@ -46,7 +61,9 @@ router.post('/login', async (req, res) => {
             token,
             user: {
                 id: user._id,
-                username: user.username
+                username: user.username,
+                role: user.role,
+                isFirstLogin: user.isFirstLogin
             }
         });
 
@@ -70,9 +87,9 @@ router.post('/change-password', auth, async (req, res) => {
             });
         }
 
-        if (newPassword.length < 8) {
+        if (newPassword.length < 4) {
             return res.status(400).json({
-                message: 'New password must be at least 8 characters long'
+                message: 'New password must be at least 4 characters long'
             });
         }
 
@@ -115,15 +132,77 @@ router.post('/change-password', auth, async (req, res) => {
     }
 });
 
-// 驗證 token (可選，用於前端檢查登入狀態)
-router.get('/verify', auth, (req, res) => {
-    res.json({
-        message: 'Token is valid',
-        user: {
-            id: req.user.userId,
-            username: req.user.username
+// 強制修改密碼 (首次登入)
+router.post('/force-change-password', auth, async (req, res) => {
+    try {
+        const { newPassword } = req.body;
+
+        if (!newPassword) {
+            return res.status(400).json({
+                message: 'New password is required'
+            });
         }
-    });
+
+        if (newPassword.length < 4) {
+            return res.status(400).json({
+                message: 'Password must be at least 4 characters long'
+            });
+        }
+
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        // 檢查是否為預設密碼
+        const isDefaultPassword = await user.comparePassword('user');
+        if (!isDefaultPassword && !user.isFirstLogin) {
+            return res.status(400).json({
+                message: 'Password has already been changed'
+            });
+        }
+
+        // 更新密碼
+        await user.updatePassword(newPassword);
+
+        res.json({
+            message: 'Password updated successfully'
+        });
+
+    } catch (error) {
+        console.error('Force change password error:', error);
+        res.status(500).json({
+            message: 'Internal server error'
+        });
+    }
+});
+
+// 驗證 token
+router.get('/verify', auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select('-password');
+        if (!user || !user.isActive) {
+            return res.status(401).json({
+                message: 'User not found or inactive'
+            });
+        }
+
+        res.json({
+            message: 'Token is valid',
+            user: {
+                id: user._id,
+                username: user.username,
+                role: user.role,
+                isFirstLogin: user.isFirstLogin
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal server error'
+        });
+    }
 });
 
 module.exports = router;

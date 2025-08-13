@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新聞管理 - ACTC 管理後台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="/components/NewsManagement.js"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-424DY83DBT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-424DY83DBT');
+        
+        // 設定全域 Measurement ID
+        window.GA_MEASUREMENT_ID = 'G-424DY83DBT';
+    </script>
+    
+    <style>
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50" x-data="newsTab()">
+    <!-- 導航列 -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/admin" class="text-xl font-bold text-gray-900">ACTC 管理後台</a>
+                    <span class="ml-4 text-gray-500">/ 新聞管理</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/admin" class="text-gray-600 hover:text-gray-900">返回首頁</a>
+                    <button @click="logout" class="bg-red-500 text-white px-4 py-2 rounded text-sm">登出</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- 頭部操作區 -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">新聞管理</h1>
+            <div class="flex space-x-2">
+                <button @click="updateAnalytics" 
+                        :disabled="isUpdatingAnalytics"
+                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50">
+                    <span x-show="!isUpdatingAnalytics">更新瀏覽數據</span>
+                    <span x-show="isUpdatingAnalytics">更新中...</span>
+                </button>
+                <button @click="showCreateModal = true" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    新增新聞
+                </button>
+            </div>
+        </div>
+
+        <!-- 統計卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="text-sm font-medium text-gray-500">已發布</div>
+                <div class="text-3xl font-bold text-green-600" x-text="stats.published?.count || 0"></div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="text-sm font-medium text-gray-500">草稿</div>
+                <div class="text-3xl font-bold text-yellow-600" x-text="stats.draft?.count || 0"></div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="text-sm font-medium text-gray-500">總瀏覽次數</div>
+                <div class="text-3xl font-bold text-blue-600" x-text="(stats.published?.totalViews || 0) + (stats.draft?.totalViews || 0)"></div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="text-sm font-medium text-gray-500">Analytics 狀態</div>
+                <div class="text-lg font-semibold" :class="analyticsStatus.enabled ? 'text-green-600' : 'text-red-600'" 
+                     x-text="analyticsStatus.enabled ? '已啟用' : '未啟用'"></div>
+            </div>
+        </div>
+
+        <!-- 搜尋和篩選 -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <div class="flex flex-col md:flex-row md:items-center gap-4">
+                <div class="flex-1">
+                    <input type="text" x-model="searchTerm" @input="debouncedSearch" 
+                           placeholder="搜尋標題或內容..." 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div class="flex gap-3">
+                    <select x-model="statusFilter" @change="loadNews" 
+                            class="px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="all">所有狀態</option>
+                        <option value="published">已發布</option>
+                        <option value="draft">草稿</option>
+                    </select>
+                    <select x-model="sortBy" @change="loadNews" 
+                            class="px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="createdAt-desc">最新建立</option>
+                        <option value="publishDate-desc">最新發布</option>
+                        <option value="viewCount-desc">最多瀏覽</option>
+                        <option value="title-asc">標題 A-Z</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 批量操作 -->
+            <div x-show="selectedNews.length > 0" class="mt-4 p-4 bg-blue-50 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <span class="text-blue-700 font-medium">
+                        已選擇 <span x-text="selectedNews.length"></span> 篇新聞
+                    </span>
+                    <div class="flex gap-2">
+                        <button @click="batchPublish" class="bg-green-600 text-white px-3 py-2 rounded text-sm">批量發布</button>
+                        <button @click="batchDraft" class="bg-yellow-600 text-white px-3 py-2 rounded text-sm">設為草稿</button>
+                        <button @click="batchDelete" class="bg-red-600 text-white px-3 py-2 rounded text-sm">批量刪除</button>
+                        <button @click="selectedNews = []" class="bg-gray-600 text-white px-3 py-2 rounded text-sm">取消選擇</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新聞列表 -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left">
+                                <input type="checkbox" @change="toggleSelectAll" :checked="isAllSelected">
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">標題</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">狀態</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">發布時間</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">瀏覽次數</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">作者</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <template x-for="news in newsList" :key="news._id">
+                            <tr :class="selectedNews.includes(news._id) ? 'bg-blue-50' : ''">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" :value="news._id" @change="toggleSelect($event, news._id)">
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-16 w-16 mr-4" x-show="news.imageUrl">
+                                            <img class="h-16 w-16 rounded-lg object-cover" :src="news.imageUrl" :alt="news.title">
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-gray-900 line-clamp-2" x-text="news.title"></div>
+                                            <div class="mt-1 flex items-center space-x-2">
+                                                <div x-show="news.featured" class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                                                    ⭐ 精選
+                                                </div>
+                                                <div x-show="news.videoUrl" class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
+                                                    🎥 影片
+                                                </div>
+                                            </div>
+                                            <div class="text-xs text-gray-400 mt-1" x-show="news.tags && news.tags.length">
+                                                <template x-for="tag in news.tags.slice(0, 3)" :key="tag">
+                                                    <span class="inline-block mr-1">#<span x-text="tag"></span></span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span :class="news.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                                          class="px-3 py-1 text-sm font-semibold rounded-full" x-text="news.status === 'published' ? '已發布' : '草稿'"></span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900" x-text="formatDate(news.publishDate)"></td>
+                                <td class="px-6 py-4 text-sm text-gray-900">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <span x-text="(news.viewCount || 0).toLocaleString()"></span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900" x-text="news.author?.fullName || news.author?.username || '-'"></td>
+                                <td class="px-6 py-4 text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <button @click="editNews(news)" class="text-blue-600 hover:text-blue-900">編輯</button>
+                                        <button @click="toggleStatus(news)" 
+                                                :class="news.status === 'published' ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'"
+                                                x-text="news.status === 'published' ? '草稿' : '發布'"></button>
+                                        <button @click="deleteNews(news)" class="text-red-600 hover:text-red-900">刪除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分頁 -->
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <button @click="changePage(pagination.page - 1)" 
+                            :disabled="pagination.page <= 1"
+                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
+                        上一頁
+                    </button>
+                    <button @click="changePage(pagination.page + 1)" 
+                            :disabled="pagination.page >= pagination.pages"
+                            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
+                        下一頁
+                    </button>
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            顯示第 <span x-text="(pagination.page - 1) * pagination.limit + 1"></span> 到 
+                            <span x-text="Math.min(pagination.page * pagination.limit, pagination.total)"></span> 項，
+                            共 <span x-text="pagination.total"></span> 項
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                            <button @click="changePage(pagination.page - 1)" 
+                                    :disabled="pagination.page <= 1"
+                                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50">
+                                ←
+                            </button>
+                            
+                            <template x-for="page in getPageNumbers()" :key="page">
+                                <button @click="changePage(page)" 
+                                        :class="page === pagination.page ? 'bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'"
+                                        class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                                        x-text="page"></button>
+                            </template>
+                            
+                            <button @click="changePage(pagination.page + 1)" 
+                                    :disabled="pagination.page >= pagination.pages"
+                                    class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50">
+                                →
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/編輯新聞 Modal -->
+    <div x-show="showCreateModal || showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg max-w-5xl w-full max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold" x-text="showEditModal ? '編輯新聞' : '新增新聞'"></h3>
+                    <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form @submit.prevent="showEditModal ? updateNews() : createNews()" enctype="multipart/form-data">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- 左欄：基本資訊 -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">標題 *</label>
+                                <input type="text" x-model="newsForm.title" required 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">摘要</label>
+                                <textarea x-model="newsForm.description" rows="3"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                          placeholder="如果留空，將自動從內容生成"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">標籤（以逗號分隔）</label>
+                                <input type="text" x-model="newsForm.tags" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="資訊安全, 培訓, 課程">
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">發布時間</label>
+                                    <input type="datetime-local" x-model="newsForm.publishDate" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">狀態</label>
+                                    <select x-model="newsForm.status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="draft">草稿</option>
+                                        <option value="published">已發布</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <input type="checkbox" x-model="newsForm.featured" id="featured" class="mr-2">
+                                <label for="featured" class="text-sm font-medium">設為精選新聞</label>
+                            </div>
+                        </div>
+                        
+                        <!-- 右欄：媒體內容 -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">主要圖片</label>
+                                <input type="file" @change="handleImageUpload" accept="image/*" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <div x-show="newsForm.imageUrl || imagePreview" class="mt-3">
+                                    <img :src="imagePreview || newsForm.imageUrl" class="w-full h-48 object-cover rounded-md">
+                                    <button type="button" @click="removeImage" class="text-red-600 text-sm mt-2 hover:text-red-800">移除圖片</button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">影片連結</label>
+                                <input type="url" x-model="newsForm.videoUrl" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="YouTube 或 Instagram 影片連結">
+                                <p class="text-xs text-gray-500 mt-1">
+                                    支援 YouTube (youtube.com/watch?v=...) 和 Instagram (instagram.com/p/...) 影片連結
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">附件檔案</label>
+                                <input type="file" @change="handleFileUpload" 
+                                       accept=".pdf,.doc,.docx,.ppt,.pptx"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <p class="text-xs text-gray-500 mt-1">支援 PDF, DOC, DOCX, PPT, PPTX 格式</p>
+                                <div x-show="newsForm.file" class="mt-2 text-sm text-gray-600">
+                                    目前檔案: <span x-text="newsForm.file.split('/').pop()"></span>
+                                    <button type="button" @click="newsForm.file = ''" class="text-red-600 ml-2 hover:text-red-800">移除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 內容編輯器 -->
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium mb-2">內容 *</label>
+                        <textarea x-model="newsForm.content" required rows="10"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  placeholder="請輸入新聞內容..."></textarea>
+                    </div>
+                    
+                    <!-- 操作按鈕 -->
+                    <div class="flex justify-end space-x-3 mt-6 pt-6 border-t">
+                        <button type="button" @click="closeModal" 
+                                class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                            取消
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            <span x-text="showEditModal ? '更新新聞' : '創建新聞'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 登出功能
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUsername');
+            window.location.href = '/admin';
+        }
+    </script>
+</body>
+</html>
