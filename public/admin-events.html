@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活動課程管理 - ACTC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body class="bg-gray-50" x-data="eventsManager()">
+    <!-- 導航列 -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="/admin" class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-arrow-left mr-2"></i>返回管理後台
+                    </a>
+                    <h1 class="text-xl font-bold">活動課程管理</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600" x-text="`歡迎, ${currentUser.username}`"></span>
+                    <button @click="logout()" class="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600">登出</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容區域 -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- 統計卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-calendar-alt text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">總活動數</p>
+                        <p class="text-2xl font-semibold text-gray-900" x-text="stats.totalEvents || 0">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">即將到來</p>
+                        <p class="text-2xl font-semibold text-gray-900" x-text="stats.upcomingEvents || 0">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-file-alt text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">有檔案</p>
+                        <p class="text-2xl font-semibold text-gray-900" x-text="stats.eventsWithFiles || 0">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-image text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">有圖片</p>
+                        <p class="text-2xl font-semibold text-gray-900" x-text="stats.eventsWithImages || 0">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按鈕和搜尋 -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
+                <div class="flex space-x-4">
+                    <button @click="showCreateModal = true" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>新增活動
+                    </button>
+                    <button @click="loadEvents()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-refresh mr-2"></i>重新載入
+                    </button>
+                </div>
+                <div class="flex space-x-4">
+                    <input type="text" x-model="searchQuery" placeholder="搜尋活動..." 
+                           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select x-model="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">全部狀態</option>
+                        <option value="draft">草稿</option>
+                        <option value="published">已發布</option>
+                        <option value="registration_open">報名開放</option>
+                        <option value="registration_closed">報名截止</option>
+                        <option value="cancelled">已取消</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                    <select x-model="typeFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">全部類型</option>
+                        <option value="meetup">聚會</option>
+                        <option value="workshop">工作坊</option>
+                        <option value="course">課程</option>
+                        <option value="conference">研討會</option>
+                        <option value="training">培訓</option>
+                        <option value="others">其他</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 活動列表 -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">活動資訊</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">講師</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">時間地點</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">狀態</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">檔案</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <template x-for="event in filteredEvents" :key="event._id">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-12 w-12">
+                                            <img x-show="event.image" :src="event.image" :alt="event.title" 
+                                                 class="h-12 w-12 rounded-lg object-cover">
+                                            <div x-show="!event.image" class="h-12 w-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-calendar text-gray-400"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900" x-text="event.title"></div>
+                                            <div class="text-sm text-gray-500" x-text="event.typeLabel"></div>
+                                            <div class="text-xs text-gray-400" x-text="event.shortDescription || event.description.substring(0, 50) + '...'"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div x-show="event.instructor && event.instructor.name">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-8 w-8">
+                                                <img x-show="event.instructor.photo" :src="event.instructor.photo" :alt="event.instructor.name" 
+                                                     class="h-8 w-8 rounded-full object-cover">
+                                                <div x-show="!event.instructor.photo" class="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-user text-gray-400 text-sm"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-3">
+                                                <div class="text-sm font-medium text-gray-900" x-text="event.instructor.name"></div>
+                                                <div class="text-sm text-gray-500" x-text="event.instructor.title || event.instructor.company"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div x-show="!event.instructor || !event.instructor.name" class="text-sm text-gray-500">未設定</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900" x-text="new Date(event.date).toLocaleDateString('zh-TW')"></div>
+                                    <div class="text-sm text-gray-500" x-text="event.location"></div>
+                                    <div x-show="event.duration" class="text-xs text-gray-400" x-text="event.formattedDuration"></div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span :class="getStatusClass(event.status)" 
+                                          class="px-2 py-1 text-xs font-semibold rounded-full" 
+                                          x-text="event.statusLabel"></span>
+                                    <div x-show="event.capacity" class="text-xs text-gray-500 mt-1" 
+                                         x-text="`${event.registeredCount || 0}/${event.capacity}`"></div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div x-show="event.hasFile" class="flex items-center space-x-2">
+                                        <i class="fas fa-file-alt text-blue-500"></i>
+                                        <span class="text-sm text-gray-600" x-text="event.file.originalName"></span>
+                                        <span class="text-xs text-gray-400" x-text="event.formattedFileSize"></span>
+                                    </div>
+                                    <div x-show="!event.hasFile" class="text-sm text-gray-400">無檔案</div>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-medium space-x-2">
+                                    <button @click="editEvent(event)" class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-edit mr-1"></i>編輯
+                                    </button>
+                                    <button @click="deleteEvent(event)" class="text-red-600 hover:text-red-900">
+                                        <i class="fas fa-trash mr-1"></i>刪除
+                                    </button>
+                                    <button @click="toggleEventStatus(event)" 
+                                            :class="event.status === 'published' ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'"
+                                            x-text="event.status === 'published' ? '下架' : '發布'"></button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 分頁 -->
+        <div x-show="pagination.totalPages > 1" class="mt-8 flex justify-center">
+            <nav class="flex space-x-2">
+                <button @click="changePage(pagination.currentPage - 1)" 
+                        :disabled="pagination.currentPage <= 1"
+                        class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                    上一頁
+                </button>
+                <template x-for="page in getPageNumbers()" :key="page">
+                    <button @click="changePage(page)" 
+                            :class="page === pagination.currentPage ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-50'"
+                            class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">
+                        <span x-text="page"></span>
+                    </button>
+                </template>
+                <button @click="changePage(pagination.currentPage + 1)" 
+                        :disabled="pagination.currentPage >= pagination.totalPages"
+                        class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                    下一頁
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 新增/編輯活動 Modal -->
+    <div x-show="showCreateModal || showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold mb-4" x-text="showEditModal ? '編輯活動' : '新增活動'"></h3>
+                <form @submit.prevent="showEditModal ? updateEvent() : createEvent()" class="space-y-6">
+                    <!-- 基本資訊 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">活動標題 *</label>
+                            <input type="text" x-model="eventForm.title" required 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">活動類型 *</label>
+                            <select x-model="eventForm.type" required 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">請選擇類型</option>
+                                <option value="meetup">聚會</option>
+                                <option value="workshop">工作坊</option>
+                                <option value="course">課程</option>
+                                <option value="conference">研討會</option>
+                                <option value="training">培訓</option>
+                                <option value="others">其他</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">開始日期 *</label>
+                            <input type="datetime-local" x-model="eventForm.date" required 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">結束日期</label>
+                            <input type="datetime-local" x-model="eventForm.endDate" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">地點 *</label>
+                            <input type="text" x-model="eventForm.location" required 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">虛擬地點</label>
+                            <input type="text" x-model="eventForm.virtualLocation" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">活動連結</label>
+                        <input type="url" x-model="eventForm.link" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="https://...">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">簡短描述</label>
+                        <textarea x-model="eventForm.shortDescription" rows="2"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder="簡短的活動描述..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">詳細描述 *</label>
+                        <textarea x-model="eventForm.description" required rows="4"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder="詳細的活動描述..."></textarea>
+                    </div>
+
+                    <!-- 講師資訊 -->
+                    <div class="border-t pt-6">
+                        <h4 class="text-md font-medium text-gray-900 mb-4">講師資訊</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">講師姓名</label>
+                                <input type="text" x-model="eventForm.instructor.name" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">講師職稱</label>
+                                <input type="text" x-model="eventForm.instructor.title" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">公司/組織</label>
+                                <input type="text" x-model="eventForm.instructor.company" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">講師照片</label>
+                                <input type="file" @change="handleInstructorPhotoUpload" accept="image/*"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">講師簡介</label>
+                            <textarea x-model="eventForm.instructor.bio" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="講師的專業背景和經驗..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 檔案上傳 -->
+                    <div class="border-t pt-6">
+                        <h4 class="text-md font-medium text-gray-900 mb-4">檔案上傳</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">活動圖片</label>
+                                <input type="file" @change="handleImageUpload" accept="image/*"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">支援 JPG, PNG, GIF 格式</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">活動檔案</label>
+                                <input type="file" @change="handleFileUpload"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">最大 20MB</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 其他設定 -->
+                    <div class="border-t pt-6">
+                        <h4 class="text-md font-medium text-gray-900 mb-4">其他設定</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">狀態</label>
+                                <select x-model="eventForm.status" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="draft">草稿</option>
+                                    <option value="published">已發布</option>
+                                    <option value="registration_open">報名開放</option>
+                                    <option value="registration_closed">報名截止</option>
+                                    <option value="cancelled">已取消</option>
+                                    <option value="completed">已完成</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">名額</label>
+                                <input type="number" x-model="eventForm.capacity" min="1"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">時長（小時）</label>
+                                <input type="number" x-model="eventForm.duration.hours" min="0"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-6 border-t">
+                        <button type="button" @click="closeModal" 
+                                class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+                            取消
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            <span x-text="showEditModal ? '更新' : '創建'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function eventsManager() {
+            return {
+                currentUser: null,
+                events: [],
+                stats: {},
+                pagination: {
+                    currentPage: 1,
+                    totalPages: 1,
+                    totalItems: 0,
+                    itemsPerPage: 10
+                },
+                searchQuery: '',
+                statusFilter: '',
+                typeFilter: '',
+                showCreateModal: false,
+                showEditModal: false,
+                eventForm: {
+                    title: '',
+                    type: '',
+                    description: '',
+                    shortDescription: '',
+                    date: '',
+                    endDate: '',
+                    location: '',
+                    virtualLocation: '',
+                    link: '',
+                    instructor: {
+                        name: '',
+                        title: '',
+                        company: '',
+                        bio: ''
+                    },
+                    duration: {
+                        hours: 0,
+                        minutes: 0
+                    },
+                    capacity: '',
+                    status: 'draft',
+                    tags: [],
+                    requirements: '',
+                    materials: []
+                },
+                uploadedFiles: {
+                    image: null,
+                    file: null,
+                    instructorPhoto: null
+                },
+
+                async init() {
+                    await this.checkAuth();
+                    await this.loadStats();
+                    await this.loadEvents();
+                },
+
+                async checkAuth() {
+                    const token = localStorage.getItem('adminToken');
+                    if (!token) {
+                        window.location.href = '/admin';
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/auth/verify', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.currentUser = data.user;
+                        } else {
+                            localStorage.removeItem('adminToken');
+                            window.location.href = '/admin';
+                        }
+                    } catch (error) {
+                        console.error('Auth check failed:', error);
+                        localStorage.removeItem('adminToken');
+                        window.location.href = '/admin';
+                    }
+                },
+
+                async loadStats() {
+                    try {
+                        const response = await fetch('/api/events/stats', {
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            this.stats = await response.json();
+                        }
+                    } catch (error) {
+                        console.error('Failed to load stats:', error);
+                    }
+                },
+
+                async loadEvents() {
+                    try {
+                        const params = new URLSearchParams({
+                            page: this.pagination.currentPage,
+                            limit: this.pagination.itemsPerPage
+                        });
+
+                        if (this.statusFilter) params.append('status', this.statusFilter);
+                        if (this.typeFilter) params.append('type', this.typeFilter);
+                        if (this.searchQuery) params.append('search', this.searchQuery);
+
+                        const response = await fetch(`/api/events/admin?${params}`, {
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.events = data.events;
+                            this.pagination = data.pagination;
+                        }
+                    } catch (error) {
+                        console.error('Failed to load events:', error);
+                    }
+                },
+
+                get filteredEvents() {
+                    return this.events;
+                },
+
+                getStatusClass(status) {
+                    const classes = {
+                        'draft': 'bg-gray-100 text-gray-800',
+                        'published': 'bg-green-100 text-green-800',
+                        'registration_open': 'bg-blue-100 text-blue-800',
+                        'registration_closed': 'bg-yellow-100 text-yellow-800',
+                        'cancelled': 'bg-red-100 text-red-800',
+                        'completed': 'bg-gray-100 text-gray-800'
+                    };
+                    return classes[status] || classes.draft;
+                },
+
+                getPageNumbers() {
+                    const pages = [];
+                    const start = Math.max(1, this.pagination.currentPage - 2);
+                    const end = Math.min(this.pagination.totalPages, this.pagination.currentPage + 2);
+                    
+                    for (let i = start; i <= end; i++) {
+                        pages.push(i);
+                    }
+                    return pages;
+                },
+
+                async changePage(page) {
+                    if (page >= 1 && page <= this.pagination.totalPages) {
+                        this.pagination.currentPage = page;
+                        await this.loadEvents();
+                    }
+                },
+
+                handleImageUpload(event) {
+                    this.uploadedFiles.image = event.target.files[0];
+                },
+
+                handleFileUpload(event) {
+                    this.uploadedFiles.file = event.target.files[0];
+                },
+
+                handleInstructorPhotoUpload(event) {
+                    this.uploadedFiles.instructorPhoto = event.target.files[0];
+                },
+
+                async createEvent() {
+                    try {
+                        const formData = new FormData();
+                        
+                        // 添加基本資料
+                        Object.keys(this.eventForm).forEach(key => {
+                            if (key === 'instructor' || key === 'duration' || key === 'price' || key === 'tags' || key === 'materials') {
+                                formData.append(key, JSON.stringify(this.eventForm[key]));
+                            } else {
+                                formData.append(key, this.eventForm[key]);
+                            }
+                        });
+
+                        // 添加檔案
+                        if (this.uploadedFiles.image) {
+                            formData.append('image', this.uploadedFiles.image);
+                        }
+                        if (this.uploadedFiles.file) {
+                            formData.append('file', this.uploadedFiles.file);
+                        }
+                        if (this.uploadedFiles.instructorPhoto) {
+                            formData.append('instructorPhoto', this.uploadedFiles.instructorPhoto);
+                        }
+
+                        const response = await fetch('/api/events', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            },
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            this.closeModal();
+                            await this.loadEvents();
+                            await this.loadStats();
+                            alert('活動創建成功！');
+                        } else {
+                            const error = await response.json();
+                            alert('創建失敗：' + error.message);
+                        }
+                    } catch (error) {
+                        console.error('Create event failed:', error);
+                        alert('創建失敗：' + error.message);
+                    }
+                },
+
+                async updateEvent() {
+                    try {
+                        const formData = new FormData();
+                        
+                        // 添加基本資料
+                        Object.keys(this.eventForm).forEach(key => {
+                            if (key === 'instructor' || key === 'duration' || key === 'price' || key === 'tags' || key === 'materials') {
+                                formData.append(key, JSON.stringify(this.eventForm[key]));
+                            } else {
+                                formData.append(key, this.eventForm[key]);
+                            }
+                        });
+
+                        // 添加檔案
+                        if (this.uploadedFiles.image) {
+                            formData.append('image', this.uploadedFiles.image);
+                        }
+                        if (this.uploadedFiles.file) {
+                            formData.append('file', this.uploadedFiles.file);
+                        }
+                        if (this.uploadedFiles.instructorPhoto) {
+                            formData.append('instructorPhoto', this.uploadedFiles.instructorPhoto);
+                        }
+
+                        const response = await fetch(`/api/events/${this.eventForm._id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            },
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            this.closeModal();
+                            await this.loadEvents();
+                            await this.loadStats();
+                            alert('活動更新成功！');
+                        } else {
+                            const error = await response.json();
+                            alert('更新失敗：' + error.message);
+                        }
+                    } catch (error) {
+                        console.error('Update event failed:', error);
+                        alert('更新失敗：' + error.message);
+                    }
+                },
+
+                editEvent(event) {
+                    this.eventForm = {
+                        _id: event._id,
+                        title: event.title,
+                        type: event.type,
+                        description: event.description,
+                        shortDescription: event.shortDescription || '',
+                        date: new Date(event.date).toISOString().slice(0, 16),
+                        endDate: event.endDate ? new Date(event.endDate).toISOString().slice(0, 16) : '',
+                        location: event.location,
+                        virtualLocation: event.virtualLocation || '',
+                        link: event.link || '',
+                        instructor: {
+                            name: event.instructor?.name || '',
+                            title: event.instructor?.title || '',
+                            company: event.instructor?.company || '',
+                            bio: event.instructor?.bio || ''
+                        },
+                        duration: {
+                            hours: event.duration?.hours || 0,
+                            minutes: event.duration?.minutes || 0
+                        },
+                        capacity: event.capacity || '',
+                        status: event.status,
+                        tags: event.tags || [],
+                        requirements: event.requirements || '',
+                        materials: event.materials || []
+                    };
+                    this.uploadedFiles = { image: null, file: null, instructorPhoto: null };
+                    this.showEditModal = true;
+                },
+
+                async deleteEvent(event) {
+                    if (!confirm('確定要刪除此活動嗎？此操作無法復原。')) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`/api/events/${event._id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            await this.loadEvents();
+                            await this.loadStats();
+                            alert('活動刪除成功！');
+                        } else {
+                            const error = await response.json();
+                            alert('刪除失敗：' + error.message);
+                        }
+                    } catch (error) {
+                        console.error('Delete event failed:', error);
+                        alert('刪除失敗：' + error.message);
+                    }
+                },
+
+                async toggleEventStatus(event) {
+                    const newStatus = event.status === 'published' ? 'draft' : 'published';
+                    
+                    try {
+                        const response = await fetch(`/api/events/${event._id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            },
+                            body: JSON.stringify({ status: newStatus })
+                        });
+
+                        if (response.ok) {
+                            await this.loadEvents();
+                            await this.loadStats();
+                            alert('狀態更新成功！');
+                        } else {
+                            const error = await response.json();
+                            alert('更新失敗：' + error.message);
+                        }
+                    } catch (error) {
+                        console.error('Toggle status failed:', error);
+                        alert('更新失敗：' + error.message);
+                    }
+                },
+
+                closeModal() {
+                    this.showCreateModal = false;
+                    this.showEditModal = false;
+                    this.eventForm = {
+                        title: '',
+                        type: '',
+                        description: '',
+                        shortDescription: '',
+                        date: '',
+                        endDate: '',
+                        location: '',
+                        virtualLocation: '',
+                        link: '',
+                        instructor: {
+                            name: '',
+                            title: '',
+                            company: '',
+                            bio: ''
+                        },
+                        duration: {
+                            hours: 0,
+                            minutes: 0
+                        },
+                        capacity: '',
+                        status: 'draft',
+                        tags: [],
+                        requirements: '',
+                        materials: []
+                    };
+                    this.uploadedFiles = { image: null, file: null, instructorPhoto: null };
+                },
+
+                logout() {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = '/admin';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -289,9 +289,69 @@
 
                 <!-- 活動課程管理 -->
                 <div x-show="currentTab === 'events'">
-                    <h2 class="text-2xl font-bold mb-6">活動課程管理</h2>
-                <div class="bg-white p-6 rounded-lg shadow">
-                        <p class="text-gray-600">活動課程管理功能開發中...</p>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="text-center">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-4">活動課程管理</h2>
+                            <p class="text-gray-600 mb-8">管理活動課程，支援檔案上傳、圖片管理和講師介紹</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <!-- 統計卡片 -->
+                                <div class="bg-blue-50 p-6 rounded-lg">
+                                    <div class="text-3xl font-bold text-blue-600 mb-2" id="eventStatsTotal">-</div>
+                                    <div class="text-sm text-gray-600">總活動數</div>
+                                </div>
+                                <div class="bg-green-50 p-6 rounded-lg">
+                                    <div class="text-3xl font-bold text-green-600 mb-2" id="eventStatsUpcoming">-</div>
+                                    <div class="text-sm text-gray-600">即將到來</div>
+                                </div>
+                                <div class="bg-purple-50 p-6 rounded-lg">
+                                    <div class="text-3xl font-bold text-purple-600 mb-2" id="eventStatsWithFiles">-</div>
+                                    <div class="text-sm text-gray-600">有檔案</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                                <a href="/admin-events.html" 
+                                   class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                    進入活動課程管理
+                                </a>
+
+                                <button onclick="loadEventQuickStats()"
+                                        class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    重新載入統計
+                                </button>
+                            </div>
+                            
+                            <!-- 功能說明 -->
+                            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-900 mb-2">✨ 主要功能</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• 新增、編輯、刪除活動課程</li>
+                                        <li>• 活動圖片上傳和管理</li>
+                                        <li>• 檔案上傳（20MB以下）</li>
+                                        <li>• 講師介紹和照片</li>
+                                        <li>• 活動狀態管理</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-900 mb-2">🎛️ 進階功能</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• 活動類型分類</li>
+                                        <li>• 報名名額管理</li>
+                                        <li>• 時間和地點設定</li>
+                                        <li>• 標籤和需求管理</li>
+                                        <li>• 統計和報表</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -708,11 +768,38 @@
             }
         }
 
+        // 載入活動課程快速統計
+        async function loadEventQuickStats() {
+            try {
+                const token = localStorage.getItem('adminToken');
+                if (!token) return;
+
+                const response = await fetch('/api/events/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    document.getElementById('eventStatsTotal').textContent = data.totalEvents || 0;
+                    document.getElementById('eventStatsUpcoming').textContent = data.upcomingEvents || 0;
+                    document.getElementById('eventStatsWithFiles').textContent = data.eventsWithFiles || 0;
+                } else {
+                    console.error('Failed to load event stats');
+                }
+            } catch (error) {
+                console.error('Error loading event stats:', error);
+            }
+        }
+
         // 頁面載入時自動載入統計
         document.addEventListener('DOMContentLoaded', function() {
             // 延遲載入統計，確保用戶已登入
             setTimeout(loadNewsQuickStats, 2000);
             setTimeout(loadMemberQuickStats, 2500);
+            setTimeout(loadEventQuickStats, 3000);
         });
     </script>
 </body>

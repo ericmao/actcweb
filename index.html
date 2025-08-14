@@ -37,6 +37,13 @@
             height: 40px !important;
             margin-top: -20px !important;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }
 
         .swiper-button-next::after,
@@ -48,10 +55,12 @@
         .swiper-pagination-bullet {
             background: rgba(255, 255, 255, 0.7) !important;
             opacity: 1 !important;
+            transition: all 0.3s ease;
         }
 
         .swiper-pagination-bullet-active {
             background: #F97316 !important;
+            transform: scale(1.2);
         }
 
         .swiper-pagination {
@@ -61,6 +70,148 @@
         /* 新聞卡片圖片樣式 */
         .news-card-image {
             border-radius: 0.5rem 0.5rem 0 0;
+        }
+
+        /* 強化動畫與過渡效果 */
+        .news-card {
+            transition: all 0.5s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .news-card.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 按鈕懸停效果 */
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+
+        .btn-hover:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 焦點狀態 */
+        button:focus,
+        a:focus {
+            outline: 2px solid #F4A460;
+            outline-offset: 2px;
+        }
+
+        /* 導航連結懸停效果 */
+        nav a {
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            transform: scale(1.05);
+        }
+
+        /* 模態框樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #E6E6FA;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: #F4A460;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            transform: scale(1.1);
+            color: #D8BFD8;
+        }
+
+        /* 自定義導航箭頭 */
+        .custom-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #F4A460;
+            border: 2px solid #D8BFD8;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .custom-nav-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 4px 12px rgba(244, 164, 96, 0.4);
+        }
+
+        .custom-nav-btn.prev {
+            left: 10px;
+        }
+
+        .custom-nav-btn.next {
+            right: 10px;
+        }
+
+        /* 淡入動畫 */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -72,7 +223,7 @@
                 <div class="flex items-center space-x-3">
                     <!-- JPG Logo for Navigation -->
                     <div class="w-10 h-10">
-                        <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full">
+                        <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full" loading="lazy">
                     </div>
                     <span class="text-xl font-bold text-gray-800">ACTC</span>
                 </div>
@@ -99,10 +250,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <!-- Logo 圖片 -->
             <div class="mb-8">
-                <!-- JPG Logo - 使用您的設計 -->
-                <div class="w-64 h-64 mx-auto">
-                    <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain">
-                </div>
+                                    <!-- JPG Logo - 使用您的設計 -->
+                    <div class="w-64 h-64 mx-auto">
+                        <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain" loading="lazy">
+                    </div>
             </div>
             <h1 class="text-4xl md:text-6xl font-bold mb-6">ACTC</h1>
             <h2 class="text-xl md:text-2xl mb-8">國際資訊安全人才培育與推廣協會</h2>
@@ -202,11 +353,39 @@
             </div>
 
             <!-- 新聞容器 -->
-            <div id="news-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- 動態載入的新聞內容 -->
+            <div id="news-container" class="hidden relative">
+                <!-- 自定義導航箭頭 -->
+                <button class="custom-nav-btn prev" id="news-prev-btn" style="display: none;">
+                    ❮
+                </button>
+                <button class="custom-nav-btn next" id="news-next-btn" style="display: none;">
+                    ❯
+                </button>
+                
+                <!-- 新聞卡片網格 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="news-grid">
+                    <!-- 動態載入的新聞內容 -->
+                </div>
+                
+                <!-- 查看所有最新消息按鈕 -->
+                <div class="text-center mt-12">
+                    <a href="#" class="inline-flex items-center px-8 py-3 bg-actc-orange text-white font-semibold rounded-lg hover:bg-actc-orange-dark transition-colors btn-hover">
+                        查看所有最新消息
+                    </a>
+                </div>
             </div>
         </div>
     </section>
+
+    <!-- 新聞詳情模態框 -->
+    <div id="news-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <div id="modal-content">
+                <!-- 模態框內容將在這裡動態生成 -->
+            </div>
+        </div>
+    </div>
 
     <!-- 活動課程列表 -->
     <section id="events" class="py-20 bg-gray-50">
@@ -298,10 +477,16 @@
         class NewsManager {
             constructor() {
                 this.newsContainer = document.getElementById('news-container');
+                this.newsGrid = document.getElementById('news-grid');
                 this.newsLoading = document.getElementById('news-loading');
                 this.newsEmpty = document.getElementById('news-empty');
                 this.newsError = document.getElementById('news-error');
+                this.newsPrevBtn = document.getElementById('news-prev-btn');
+                this.newsNextBtn = document.getElementById('news-next-btn');
                 this.swiperInstances = [];
+                this.currentPage = 0;
+                this.newsPerPage = 6;
+                this.allNews = [];
                 this.init();
             }
 
@@ -330,11 +515,15 @@
                     return;
                 }
 
+                this.allNews = news;
                 this.newsContainer.classList.remove('hidden');
-                this.newsContainer.innerHTML = news.map((item, index) => this.createNewsCard(item, index)).join('');
+                this.updateNewsDisplay();
                 
                 // 初始化所有 Swiper 實例
                 this.initializeSwipers(news);
+                
+                // 綁定導航按鈕事件
+                this.bindNavigationEvents();
             }
 
             createNewsCard(news, index) {
@@ -348,7 +537,7 @@
                 const imageSlides = news.images && news.images.length > 0 
                     ? news.images.map(img => `
                         <div class="swiper-slide">
-                            <img src="${img}" alt="${news.title}" class="w-full h-48 object-cover">
+                            <img src="${img}" alt="${news.title}" class="w-full h-48 object-cover" loading="lazy">
                         </div>
                     `).join('')
                     : `
@@ -385,7 +574,7 @@
                 }
 
                 return `
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow news-card cursor-pointer" onclick="newsManager.showNewsModal(${JSON.stringify(news).replace(/"/g, '&quot;')})">
                         <!-- 圖片輪播區塊 -->
                         <div class="relative">
                             <div class="swiper news-swiper-${index}">
@@ -448,6 +637,104 @@
                 });
             }
 
+            updateNewsDisplay() {
+                const startIndex = this.currentPage * this.newsPerPage;
+                const endIndex = startIndex + this.newsPerPage;
+                const currentNews = this.allNews.slice(startIndex, endIndex);
+                
+                this.newsGrid.innerHTML = currentNews.map((item, index) => this.createNewsCard(item, startIndex + index)).join('');
+                
+                // 更新導航按鈕顯示狀態
+                this.updateNavigationButtons();
+                
+                // 添加載入動畫
+                setTimeout(() => {
+                    document.querySelectorAll('.news-card').forEach((card, index) => {
+                        setTimeout(() => {
+                            card.classList.add('loaded');
+                        }, index * 100);
+                    });
+                }, 100);
+            }
+            
+            updateNavigationButtons() {
+                const totalPages = Math.ceil(this.allNews.length / this.newsPerPage);
+                
+                this.newsPrevBtn.style.display = this.currentPage > 0 ? 'flex' : 'none';
+                this.newsNextBtn.style.display = this.currentPage < totalPages - 1 ? 'flex' : 'none';
+            }
+            
+            bindNavigationEvents() {
+                this.newsPrevBtn.addEventListener('click', () => {
+                    if (this.currentPage > 0) {
+                        this.currentPage--;
+                        this.updateNewsDisplay();
+                    }
+                });
+                
+                this.newsNextBtn.addEventListener('click', () => {
+                    const totalPages = Math.ceil(this.allNews.length / this.newsPerPage);
+                    if (this.currentPage < totalPages - 1) {
+                        this.currentPage++;
+                        this.updateNewsDisplay();
+                    }
+                });
+            }
+            
+            showNewsModal(news) {
+                const modal = document.getElementById('news-modal');
+                const modalContent = document.getElementById('modal-content');
+                
+                const formattedDate = new Date(news.date).toLocaleDateString('zh-TW', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'short'
+                });
+                
+                modalContent.innerHTML = `
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">${news.title}</h2>
+                        <p class="text-gray-600">${formattedDate}</p>
+                    </div>
+                    
+                    ${news.images && news.images.length > 0 ? `
+                        <div class="mb-6">
+                            <img src="${news.images[0]}" alt="${news.title}" class="w-full h-64 object-cover rounded-lg" loading="lazy">
+                        </div>
+                    ` : ''}
+                    
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">內容簡介</h3>
+                        <p class="text-gray-700 leading-relaxed">${news.description || news.summary || '無描述'}</p>
+                    </div>
+                    
+                    ${news.file ? `
+                        <div class="mb-4">
+                            <a href="${news.file}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                下載檔案
+                            </a>
+                        </div>
+                    ` : ''}
+                    
+                    ${news.link ? `
+                        <div class="mb-4">
+                            <a href="${news.link}" target="_blank" class="inline-flex items-center px-4 py-2 bg-actc-orange text-white rounded-md hover:bg-actc-orange-dark transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 7l10 10M17 7h-4v4"></path>
+                                </svg>
+                                活動連結
+                            </a>
+                        </div>
+                    ` : ''}
+                `;
+                
+                modal.style.display = 'block';
+            }
+            
             showError() {
                 this.newsLoading.classList.add('hidden');
                 this.newsError.classList.remove('hidden');
@@ -455,8 +742,31 @@
         }
 
         // 初始化新聞管理
+        let newsManager;
         document.addEventListener('DOMContentLoaded', () => {
-            new NewsManager();
+            newsManager = new NewsManager();
+            
+            // 綁定模態框關閉事件
+            const modal = document.getElementById('news-modal');
+            const closeBtn = document.getElementById('close-modal');
+            
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            
+            // 點擊模態框外部關閉
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // ESC鍵關閉模態框
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modal.style.display === 'block') {
+                    modal.style.display = 'none';
+                }
+            });
         });
     </script>
 

@@ -62,7 +62,47 @@ const eventSchema = new mongoose.Schema({
             message: 'Link must be a valid URL'
         }
     },
-    // 新增欄位
+    // 活動圖檔
+    image: {
+        type: String,
+        trim: true,
+        validate: {
+            validator: function(v) {
+                if (!v) return true; // 允許空值
+                return /^\/uploads\/images\/.+/.test(v);
+            },
+            message: 'Image path must be a valid upload path'
+        }
+    },
+    // 活動檔案（20MB以下）
+    file: {
+        path: {
+            type: String,
+            trim: true,
+            validate: {
+                validator: function(v) {
+                    if (!v) return true; // 允許空值
+                    return /^\/uploads\/files\/.+/.test(v);
+                },
+                message: 'File path must be a valid upload path'
+            }
+        },
+        originalName: {
+            type: String,
+            trim: true,
+            maxlength: [255, 'Original filename cannot exceed 255 characters']
+        },
+        size: {
+            type: Number,
+            min: [0, 'File size cannot be negative'],
+            max: [20 * 1024 * 1024, 'File size cannot exceed 20MB'] // 20MB限制
+        },
+        mimeType: {
+            type: String,
+            trim: true
+        }
+    },
+    // 增強的講師介紹
     instructor: {
         name: {
             type: String,
@@ -78,6 +118,62 @@ const eventSchema = new mongoose.Schema({
             type: String,
             trim: true,
             maxlength: [100, 'Company name cannot exceed 100 characters']
+        },
+        bio: {
+            type: String,
+            trim: true,
+            maxlength: [500, 'Instructor bio cannot exceed 500 characters']
+        },
+        photo: {
+            type: String,
+            trim: true,
+            validate: {
+                validator: function(v) {
+                    if (!v) return true; // 允許空值
+                    return /^\/uploads\/images\/.+/.test(v);
+                },
+                message: 'Instructor photo path must be a valid upload path'
+            }
+        },
+        expertise: [{
+            type: String,
+            trim: true,
+            maxlength: [50, 'Expertise item cannot exceed 50 characters']
+        }],
+        socialLinks: {
+            linkedin: {
+                type: String,
+                trim: true,
+                validate: {
+                    validator: function(v) {
+                        if (!v) return true;
+                        return /^https?:\/\/.+/.test(v);
+                    },
+                    message: 'LinkedIn URL must be a valid URL'
+                }
+            },
+            twitter: {
+                type: String,
+                trim: true,
+                validate: {
+                    validator: function(v) {
+                        if (!v) return true;
+                        return /^https?:\/\/.+/.test(v);
+                    },
+                    message: 'Twitter URL must be a valid URL'
+                }
+            },
+            website: {
+                type: String,
+                trim: true,
+                validate: {
+                    validator: function(v) {
+                        if (!v) return true;
+                        return /^https?:\/\/.+/.test(v);
+                    },
+                    message: 'Website URL must be a valid URL'
+                }
+            }
         }
     },
     duration: {
@@ -152,6 +248,17 @@ const eventSchema = new mongoose.Schema({
             maxlength: [200, 'Material description cannot exceed 200 characters']
         }
     }],
+    // 活動統計
+    views: {
+        type: Number,
+        default: 0,
+        min: [0, 'Views cannot be negative']
+    },
+    downloads: {
+        type: Number,
+        default: 0,
+        min: [0, 'Downloads cannot be negative']
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -166,6 +273,7 @@ eventSchema.index({ type: 1 });
 eventSchema.index({ status: 1 });
 eventSchema.index({ tags: 1 });
 eventSchema.index({ createdAt: -1 });
+eventSchema.index({ 'instructor.name': 1 });
 
 // 虛擬字段：格式化日期
 eventSchema.virtual('formattedDate').get(function() {
@@ -272,6 +380,28 @@ eventSchema.virtual('formattedDuration').get(function() {
     }
     
     return result || '時長未定';
+});
+
+// 虛擬字段：檢查是否有檔案
+eventSchema.virtual('hasFile').get(function() {
+    return !!(this.file && this.file.path);
+});
+
+// 虛擬字段：檢查是否有圖片
+eventSchema.virtual('hasImage').get(function() {
+    return !!(this.image || (this.instructor && this.instructor.photo));
+});
+
+// 虛擬字段：檔案大小格式化
+eventSchema.virtual('formattedFileSize').get(function() {
+    if (!this.file || !this.file.size) return '';
+    
+    const bytes = this.file.size;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    if (bytes === 0) return '0 Bytes';
+    
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
 });
 
 // 確保虛擬字段在 JSON 中顯示

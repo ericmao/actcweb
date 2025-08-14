@@ -1,8 +1,67 @@
 const express = require('express');
 const Event = require('../models/Event');
 const auth = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
+
+// 配置 multer 用於檔案上傳
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let uploadPath;
+        
+        if (file.fieldname === 'image' || file.fieldname === 'instructorPhoto') {
+            uploadPath = 'uploads/images/';
+        } else if (file.fieldname === 'file') {
+            uploadPath = 'uploads/files/';
+        } else {
+            uploadPath = 'uploads/';
+        }
+        
+        // 確保目錄存在
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+        // 生成唯一檔名
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.fieldname === 'image' || file.fieldname === 'instructorPhoto') {
+        // 圖片檔案類型檢查
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed for image fields'), false);
+        }
+    } else if (file.fieldname === 'file') {
+        // 一般檔案類型檢查（20MB限制）
+        if (file.size > 20 * 1024 * 1024) {
+            cb(new Error('File size cannot exceed 20MB'), false);
+        } else {
+            cb(null, true);
+        }
+    } else {
+        cb(null, true);
+    }
+};
+
+const upload = multer({ 
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: 20 * 1024 * 1024 // 20MB
+    }
+});
 
 // 獲取所有活動 (公開)
 router.get('/', async (req, res) => {
@@ -194,9 +253,15 @@ router.get('/stats', auth, async (req, res) => {
             status: { $in: ['published', 'registration_open'] }
         });
         
+        // 新增檔案和圖片統計
+        const eventsWithFiles = await Event.countDocuments({ 'file.path': { $exists: true, $ne: null } });
+        const eventsWithImages = await Event.countDocuments({ 'image': { $exists: true, $ne: null } });
+        
         res.json({
             totalEvents,
             upcomingEvents,
+            eventsWithFiles,
+            eventsWithImages,
             statusBreakdown: stats
         });
     } catch (error) {
@@ -207,8 +272,12 @@ router.get('/stats', auth, async (req, res) => {
     }
 });
 
-// 創建活動 (需要認證)
-router.post('/', auth, async (req, res) => {
+// 創建活動 (需要認證，支援檔案上傳)
+router.post('/', auth, upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'file', maxCount: 1 },
+    { name: 'instructorPhoto', maxCount: 1 }
+]), async (req, res) => {
     try {
         const { 
             title, 
@@ -253,8 +322,8 @@ router.post('/', auth, async (req, res) => {
             });
         }
 
-        // 創建活動
-        const event = new Event({
+        // 處理檔案上傳
+        let eventData = {
             title,
             type,
             description,
@@ -264,16 +333,38 @@ router.post('/', auth, async (req, res) => {
             location,
             virtualLocation,
             link: link || '',
-            instructor: instructor || {},
-            duration: duration || {},
+            instructor: instructor ? JSON.parse(instructor) : {},
+            duration: duration ? JSON.parse(duration) : {},
             capacity: capacity || undefined,
-            price: price || { isFree: true },
+            price: price ? JSON.parse(price) : { isFree: true },
             status: status || 'draft',
-            tags: tags || [],
+            tags: tags ? JSON.parse(tags) : [],
             requirements,
-            materials: materials || []
-        });
+            materials: materials ? JSON.parse(materials) : []
+        };
 
+        // 處理活動圖片
+        if (req.files && req.files.image) {
+            eventData.image = '/' + req.files.image[0].path;
+        }
+
+        // 處理活動檔案
+        if (req.files && req.files.file) {
+            eventData.file = {
+                path: '/' + req.files.file[0].path,
+                originalName: req.files.file[0].originalname,
+                size: req.files.file[0].size,
+                mimeType: req.files.file[0].mimetype
+            };
+        }
+
+        // 處理講師照片
+        if (req.files && req.files.instructorPhoto && eventData.instructor) {
+            eventData.instructor.photo = '/' + req.files.instructorPhoto[0].path;
+        }
+
+        // 創建活動
+        const event = new Event(eventData);
         await event.save();
 
         res.status(201).json({
@@ -302,8 +393,12 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
-// 更新活動 (需要認證)
-router.put('/:id', auth, async (req, res) => {
+// 更新活動 (需要認證，支援檔案上傳)
+router.put('/:id', auth, upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'file', maxCount: 1 },
+    { name: 'instructorPhoto', maxCount: 1 }
+]), async (req, res) => {
     try {
         const { id } = req.params;
         const updateData = req.body;
@@ -342,6 +437,56 @@ router.put('/:id', auth, async (req, res) => {
         }
         if (updateData.endDate) {
             updateData.endDate = new Date(updateData.endDate);
+        }
+
+        // 處理 JSON 欄位
+        if (updateData.instructor) {
+            updateData.instructor = JSON.parse(updateData.instructor);
+        }
+        if (updateData.duration) {
+            updateData.duration = JSON.parse(updateData.duration);
+        }
+        if (updateData.price) {
+            updateData.price = JSON.parse(updateData.price);
+        }
+        if (updateData.tags) {
+            updateData.tags = JSON.parse(updateData.tags);
+        }
+        if (updateData.materials) {
+            updateData.materials = JSON.parse(updateData.materials);
+        }
+
+        // 處理檔案上傳
+        if (req.files && req.files.image) {
+            updateData.image = '/' + req.files.image[0].path;
+            
+            // 刪除舊圖片
+            if (event.image && fs.existsSync(event.image.substring(1))) {
+                fs.unlinkSync(event.image.substring(1));
+            }
+        }
+
+        if (req.files && req.files.file) {
+            updateData.file = {
+                path: '/' + req.files.file[0].path,
+                originalName: req.files.file[0].originalname,
+                size: req.files.file[0].size,
+                mimeType: req.files.file[0].mimetype
+            };
+            
+            // 刪除舊檔案
+            if (event.file && event.file.path && fs.existsSync(event.file.path.substring(1))) {
+                fs.unlinkSync(event.file.path.substring(1));
+            }
+        }
+
+        if (req.files && req.files.instructorPhoto && updateData.instructor) {
+            updateData.instructor.photo = '/' + req.files.instructorPhoto[0].path;
+            
+            // 刪除舊講師照片
+            if (event.instructor && event.instructor.photo && fs.existsSync(event.instructor.photo.substring(1))) {
+                fs.unlinkSync(event.instructor.photo.substring(1));
+            }
         }
 
         // 更新活動
@@ -389,6 +534,19 @@ router.delete('/:id', auth, async (req, res) => {
             });
         }
 
+        // 刪除相關檔案
+        if (event.image && fs.existsSync(event.image.substring(1))) {
+            fs.unlinkSync(event.image.substring(1));
+        }
+        
+        if (event.file && event.file.path && fs.existsSync(event.file.path.substring(1))) {
+            fs.unlinkSync(event.file.path.substring(1));
+        }
+        
+        if (event.instructor && event.instructor.photo && fs.existsSync(event.instructor.photo.substring(1))) {
+            fs.unlinkSync(event.instructor.photo.substring(1));
+        }
+
         // 刪除活動
         await Event.findByIdAndDelete(id);
 
@@ -423,9 +581,58 @@ router.get('/:id', async (req, res) => {
             });
         }
 
+        // 增加瀏覽次數
+        event.views += 1;
+        await event.save();
+
         res.json(event);
     } catch (error) {
         console.error('Get single event error:', error);
+        res.status(500).json({
+            message: 'Internal server error'
+        });
+    }
+});
+
+// 下載活動檔案 (公開)
+router.get('/:id/download', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const event = await Event.findById(id);
+        
+        if (!event) {
+            return res.status(404).json({
+                message: 'Event not found'
+            });
+        }
+
+        if (!event.file || !event.file.path) {
+            return res.status(404).json({
+                message: 'No file available for download'
+            });
+        }
+
+        // 檢查檔案是否存在
+        const filePath = event.file.path.substring(1);
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({
+                message: 'File not found on server'
+            });
+        }
+
+        // 增加下載次數
+        event.downloads += 1;
+        await event.save();
+
+        // 設定下載標頭
+        res.setHeader('Content-Disposition', `attachment; filename="${event.file.originalName}"`);
+        res.setHeader('Content-Type', event.file.mimeType);
+        
+        // 發送檔案
+        res.sendFile(path.resolve(filePath));
+
+    } catch (error) {
+        console.error('Download event file error:', error);
         res.status(500).json({
             message: 'Internal server error'
         });

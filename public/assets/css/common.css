@@ -5,18 +5,29 @@
     --actc-orange: #F97316;
     --actc-orange-light: #FB923C;
     --actc-orange-dark: #EA580C;
+    --actc-sand: #F4A460;
+    --actc-lavender: #D8BFD8;
+    --actc-light-lavender: #E6E6FA;
 }
 
 /* 自定義顏色類別 - 作為 Tailwind 的備用方案 */
 .bg-actc-orange { background-color: var(--actc-orange) !important; }
 .bg-actc-orange-light { background-color: var(--actc-orange-light) !important; }
 .bg-actc-orange-dark { background-color: var(--actc-orange-dark) !important; }
+.bg-actc-sand { background-color: var(--actc-sand) !important; }
+.bg-actc-lavender { background-color: var(--actc-lavender) !important; }
+.bg-actc-light-lavender { background-color: var(--actc-light-lavender) !important; }
 .text-actc-orange { color: var(--actc-orange) !important; }
 .text-actc-orange-light { color: var(--actc-orange-light) !important; }
 .text-actc-orange-dark { color: var(--actc-orange-dark) !important; }
+.text-actc-sand { color: var(--actc-sand) !important; }
+.text-actc-lavender { color: var(--actc-lavender) !important; }
+.text-actc-light-lavender { color: var(--actc-light-lavender) !important; }
 .border-actc-orange { border-color: var(--actc-orange) !important; }
 .border-actc-orange-light { border-color: var(--actc-orange-light) !important; }
 .border-actc-orange-dark { border-color: var(--actc-orange-dark) !important; }
+.border-actc-sand { border-color: var(--actc-sand) !important; }
+.border-actc-lavender { border-color: var(--actc-lavender) !important; }
 
 /* 自定義樣式 */
 .line-clamp-2 {
@@ -42,8 +53,13 @@
 }
 
 .category-filter:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.05);
     box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+}
+
+.category-filter:focus {
+    outline: 2px solid var(--actc-sand);
+    outline-offset: 2px;
 }
 
 .category-filter.active {
@@ -58,27 +74,47 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 12px;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .news-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-4px) scale(1.02);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Carousel 動畫與過渡效果 */
+.carousel-item {
+    transition: opacity 0.5s ease;
+}
+
+.swiper-slide {
+    transition: opacity 0.5s ease;
 }
 
 /* Swiper 導航按鈕樣式 */
 .swiper-button-next,
 .swiper-button-prev {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: var(--actc-sand) !important;
+    border: 2px solid var(--actc-lavender) !important;
     border-radius: 50%;
     width: 44px;
     height: 44px;
-    color: var(--actc-orange);
+    color: white !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
 .swiper-button-next:hover,
 .swiper-button-prev:hover {
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: var(--actc-orange) !important;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.swiper-button-next:focus,
+.swiper-button-prev:focus {
+    outline: 2px solid var(--actc-sand);
+    outline-offset: 2px;
 }
 
 .swiper-pagination-bullet {
@@ -97,7 +133,7 @@
 }
 
 .member-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-4px) scale(1.02);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
@@ -115,8 +151,13 @@
 
 .btn-primary:hover {
     background-color: var(--actc-orange-dark);
-    transform: translateY(-1px);
+    transform: translateY(-1px) scale(1.05);
     box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+.btn-primary:focus {
+    outline: 2px solid var(--actc-sand);
+    outline-offset: 2px;
 }
 
 /* 改進的導航欄樣式 */
@@ -138,6 +179,11 @@
 
 .nav-link:hover::after {
     width: 100%;
+}
+
+.nav-link:focus {
+    outline: 2px solid var(--actc-sand);
+    outline-offset: 2px;
 }
 
 /* 改進的頁面載入動畫 */
@@ -166,6 +212,72 @@
     animation: fadeInUp 0.6s ease-out forwards;
 }
 
+/* 模態框樣式 */
+.news-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.news-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.news-modal-content {
+    background-color: var(--actc-light-lavender);
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.news-modal.show .news-modal-content {
+    transform: scale(1);
+}
+
+.news-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: var(--actc-sand);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.news-modal-close:hover {
+    background-color: var(--actc-orange);
+    transform: scale(1.1);
+}
+
+.news-modal-close:focus {
+    outline: 2px solid var(--actc-sand);
+    outline-offset: 2px;
+}
+
 /* 響應式設計優化 */
 @media (max-width: 768px) {
     .category-filter {
@@ -182,6 +294,11 @@
     .swiper-button-prev {
         width: 36px;
         height: 36px;
+    }
+    
+    .news-modal-content {
+        padding: 1.5rem;
+        margin: 1rem;
     }
 }
 

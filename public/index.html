@@ -21,20 +21,20 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10">
-                        <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full">
+                        <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full" loading="lazy">
                     </div>
                     <span class="text-xl font-bold text-gray-800">ACTC</span>
                 </div>
                 <div class="hidden md:flex space-x-8">
-                    <a href="#home" class="nav-link text-gray-600 hover:text-actc-orange transition-colors">首頁</a>
-                    <a href="about.html" class="nav-link text-gray-600 hover:text-actc-orange transition-colors">關於協會</a>
-                    <a href="#news" class="nav-link text-gray-600 hover:text-actc-orange transition-colors">最新消息</a>
-                    <a href="#events" class="nav-link text-gray-600 hover:text-actc-orange transition-colors">活動課程</a>
-                    <a href="#corporate-members" class="nav-link text-gray-600 hover:text-actc-orange transition-colors">企業會員</a>
-                    <a href="workgroups.html" class="nav-link text-gray-600 hover:text-actc-orange transition-colors">工作小組</a>
+                    <a href="#home" class="nav-link text-gray-600 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">首頁</a>
+                    <a href="about.html" class="nav-link text-gray-600 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">關於協會</a>
+                    <a href="#news" class="nav-link text-gray-600 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">最新消息</a>
+                    <a href="#events" class="nav-link text-gray-600 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">活動課程</a>
+                    <a href="#corporate-members" class="nav-link text-gray-600 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">企業會員</a>
+                    <a href="workgroups.html" class="nav-link text-gray-600 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">工作小組</a>
                 </div>
                 <div class="md:hidden">
-                    <button class="text-gray-600 hover:text-actc-orange">
+                    <button class="text-gray-600 hover:text-actc-orange focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
@@ -49,7 +49,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div class="mb-8">
                 <div class="w-64 h-64 mx-auto">
-                    <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain">
+                    <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain" loading="lazy">
                 </div>
             </div>
             <h1 class="text-4xl md:text-6xl font-bold mb-6">ACTC</h1>
@@ -114,7 +114,7 @@
 
             <!-- 載入更多按鈕 -->
             <div id="load-more-container" class="text-center mt-12 hidden">
-                <button id="load-more-btn" class="btn-primary px-8 py-3">
+                <button id="load-more-btn" class="btn-primary px-8 py-3 focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2">
                     載入更多消息
                 </button>
             </div>
@@ -140,7 +140,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">搜尋活動課程</label>
                         <div class="relative">
                             <input type="text" id="eventsSearch" placeholder="搜尋標題、描述、講師..." 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange">
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-sand focus:border-actc-sand">
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                 <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -152,7 +152,7 @@
                     <!-- 類型篩選 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">活動類型</label>
-                        <select id="eventsTypeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange">
+                        <select id="eventsTypeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-sand focus:border-actc-sand">
                             <option value="">全部類型</option>
                             <option value="course">課程</option>
                             <option value="workshop">工作坊</option>
@@ -166,7 +166,7 @@
                     <!-- 排序方式 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">排序方式</label>
-                        <select id="eventsSort" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange">
+                        <select id="eventsSort" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-sand focus:border-actc-sand">
                             <option value="date-asc">日期 (近到遠)</option>
                             <option value="date-desc">日期 (遠到近)</option>
                             <option value="title-asc">標題 (A-Z)</option>
@@ -211,7 +211,7 @@
 
             <!-- 載入更多按鈕 -->
             <div id="load-more-events-container" class="text-center mt-12 hidden">
-                <button id="load-more-events-btn" class="btn-primary px-8 py-3">
+                <button id="load-more-events-btn" class="btn-primary px-8 py-3 focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2">
                     載入更多活動
                 </button>
             </div>
@@ -260,7 +260,7 @@
 
             <!-- 查看更多按鈕 -->
             <div class="text-center mt-12">
-                <a href="corporate-members.html" class="btn-primary inline-flex items-center px-8 py-3 font-medium">
+                <a href="corporate-members.html" class="btn-primary inline-flex items-center px-8 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2">
                     查看所有企業會員
                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
@@ -277,7 +277,7 @@
                 <div>
                     <div class="flex items-center space-x-3 mb-4">
                         <div class="w-10 h-10">
-                            <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full">
+                            <img src="assets/images/actc-logo.jpg" alt="ACTC Logo" class="w-full h-full object-contain rounded-full" loading="lazy">
                         </div>
                         <span class="text-xl font-bold">ACTC</span>
                     </div>
@@ -296,11 +296,11 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">快速連結</h3>
                     <div class="space-y-2">
-                        <a href="about.html" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors">關於協會</a>
-                        <a href="#news" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors">最新消息</a>
-                        <a href="#events" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors">活動課程</a>
-                        <a href="#corporate-members" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors">企業會員</a>
-                        <a href="workgroups.html" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors">工作小組</a>
+                        <a href="about.html" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">關於協會</a>
+                        <a href="#news" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">最新消息</a>
+                        <a href="#events" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">活動課程</a>
+                        <a href="#corporate-members" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">企業會員</a>
+                        <a href="workgroups.html" class="nav-link block text-gray-300 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">工作小組</a>
                     </div>
                 </div>
             </div>
@@ -406,13 +406,18 @@
                 const category = news.category || '一般';
                 
                 return `
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" 
+                         onclick="showNewsModal('${news.title}', '${newsDate.toLocaleDateString('zh-TW')}', '${news.description.replace(/'/g, "\\'")}', '${news.category || '一般'}')"
+                         role="button"
+                         tabindex="0"
+                         aria-label="點擊查看 ${news.title} 的詳細資訊"
+                         onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); showNewsModal('${news.title}', '${newsDate.toLocaleDateString('zh-TW')}', '${news.description.replace(/'/g, "\\'")}', '${news.category || '一般'}') }">
                         ${hasImages ? `
                             <div class="swiper-container h-48 relative">
                                 <div class="swiper-wrapper">
                                     ${images.map(img => `
                                         <div class="swiper-slide">
-                                            <img src="${img.startsWith('/') ? img : '/' + img}" alt="${news.title}" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                                            <img src="${img.startsWith('/') ? img : '/' + img}" alt="${news.title}" class="w-full h-full object-cover" loading="lazy" onerror="this.style.display='none'">
                                         </div>
                                     `).join('')}
                                 </div>
@@ -429,7 +434,7 @@
                                 </div>
                             </div>
                         ` : `
-                            <div class="h-48 bg-gradient-to-br from-actc-orange to-actc-orange-dark flex items-center justify-center relative">
+                            <div class="h-48 bg-gradient-to-br from-actc-orange to-actc-orange-dark flex items-center justify-center relative hover:opacity-90 transition-opacity">
                                 <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
@@ -452,7 +457,7 @@
                             
                             <div class="space-y-2">
                                 ${hasFile ? `
-                                    <a href="${news.file.startsWith('/') ? news.file : '/' + news.file}" download class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-actc-orange hover:bg-actc-orange-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-actc-orange transition-colors">
+                                    <a href="${news.file.startsWith('/') ? news.file : '/' + news.file}" download class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-actc-orange hover:bg-actc-orange-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-actc-sand transition-colors">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 012 2z" />
                                         </svg>
@@ -461,7 +466,7 @@
                                 ` : ''}
                                 
                                 ${hasLink ? `
-                                    <a href="${news.link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-2 border border-actc-orange text-sm leading-4 font-medium rounded-md text-actc-orange bg-white hover:bg-gray-50 transition-colors">
+                                    <a href="${news.link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-2 border border-actc-orange text-sm leading-4 font-medium rounded-md text-actc-orange bg-white hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                         </svg>
@@ -610,7 +615,7 @@
                 
                 const logoDisplay = member.logo ? 
                     `<div class="w-full h-32 mb-4 flex items-center justify-center bg-gray-50 rounded-lg p-4">
-                        <img src="${member.logo.startsWith('http') ? member.logo : member.logo}" alt="${member.companyName} Logo" class="max-w-full max-h-full object-contain" onerror="this.parentElement.innerHTML='<svg class=&quot;w-12 h-12 text-gray-400&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; viewBox=&quot;0 0 24 24&quot;><path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; stroke-width=&quot;2&quot; d=&quot;M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4&quot;></path></svg>';">
+                        <img src="${member.logo.startsWith('http') ? member.logo : member.logo}" alt="${member.companyName} Logo" class="max-w-full max-h-full object-contain" loading="lazy" onerror="this.parentElement.innerHTML='<svg class=&quot;w-12 h-12 text-gray-400&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; viewBox=&quot;0 0 24 24&quot;><path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; stroke-width=&quot;2&quot; d=&quot;M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4&quot;></path></svg>';">
                      </div>` :
                     `<div class="w-full h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg mb-4 flex items-center justify-center">
                         <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -620,7 +625,7 @@
 
                 const websiteLink = member.website ? 
                     `<div class="pt-3 border-t border-gray-100 mt-auto">
-                        <a href="${member.website}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-actc-orange hover:text-actc-orange-dark transition-colors font-medium text-sm">
+                        <a href="${member.website}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-actc-orange hover:text-actc-orange-dark transition-colors font-medium text-sm focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">
                             <span>訪問網站</span>
                             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
@@ -763,7 +768,7 @@
                 this.tagsFilter.innerHTML = '';
                 allTags.forEach(tag => {
                     const tagButton = document.createElement('button');
-                    tagButton.className = 'px-3 py-1 text-sm border border-gray-300 rounded-full hover:bg-actc-orange hover:text-white hover:border-actc-orange transition-colors';
+                    tagButton.className = 'px-3 py-1 text-sm border border-gray-300 rounded-full hover:bg-actc-orange hover:text-white hover:border-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2';
                     tagButton.textContent = tag;
                     tagButton.dataset.tag = tag;
                     
@@ -849,9 +854,13 @@
                 return `
                     <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                         <div class="h-48 bg-gradient-to-br from-actc-orange to-actc-orange-dark flex items-center justify-center relative">
-                            <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                            </svg>
+                            ${event.image ? `
+                                <img src="${event.image}" alt="${event.title}" class="w-full h-full object-cover">
+                            ` : `
+                                <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            `}
                             
                             <!-- 類型標籤 -->
                             <div class="absolute top-3 left-3">
@@ -960,13 +969,19 @@
                                 <!-- 操作按鈕 -->
                                 <div class="flex gap-2 mt-4">
                                     ${event.canRegister ? `
-                                        <button onclick="registerForEvent('${event._id}')" class="flex-1 bg-actc-orange hover:bg-actc-orange-dark text-white px-4 py-2 rounded-md transition-colors text-sm font-medium">
+                                        <button onclick="registerForEvent('${event._id}')" class="flex-1 bg-actc-orange hover:bg-actc-orange-dark text-white px-4 py-2 rounded-md transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2">
                                             立即報名
                                         </button>
                                     ` : ''}
                                     
+                                    ${event.hasFile ? `
+                                        <a href="/api/events/${event._id}/download" class="flex-1 border border-blue-500 text-blue-500 bg-white hover:bg-blue-50 px-4 py-2 rounded-md transition-colors text-sm font-medium text-center focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2">
+                                            <i class="fas fa-download mr-2"></i>下載檔案
+                                        </a>
+                                    ` : ''}
+                                    
                                     ${event.link ? `
-                                        <a href="${event.link}" target="_blank" rel="noopener noreferrer" class="flex-1 border border-actc-orange text-actc-orange bg-white hover:bg-gray-50 px-4 py-2 rounded-md transition-colors text-sm font-medium text-center">
+                                        <a href="${event.link}" target="_blank" rel="noopener noreferrer" class="flex-1 border border-actc-orange text-actc-orange bg-white hover:bg-gray-50 px-4 py-2 rounded-md transition-colors text-sm font-medium text-center focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2">
                                             ${event.link.includes('discord') ? 'Discord' : 
                                               event.link.includes('teams') ? 'Teams' : 
                                               event.link.includes('zoom') ? 'Zoom' : 
@@ -1159,20 +1174,20 @@
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">姓名 *</label>
                                 <input type="text" id="participantName" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-sand focus:border-actc-sand"
                                        placeholder="請輸入您的姓名">
                             </div>
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">電子郵件 *</label>
                                 <input type="email" id="participantEmail" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-orange focus:border-actc-orange"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-actc-sand focus:border-actc-sand"
                                        placeholder="請輸入您的電子郵件">
                             </div>
                             <div class="flex gap-3">
-                                <button type="submit" class="flex-1 bg-actc-orange hover:bg-actc-orange-dark text-white px-4 py-2 rounded-md transition-colors">
+                                <button type="submit" class="flex-1 bg-actc-orange hover:bg-actc-orange-dark text-white px-4 py-2 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2">
                                     確認報名
                                 </button>
-                                <button type="button" onclick="closeRegistrationModal()" class="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors">
+                                <button type="button" onclick="closeRegistrationModal()" class="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2">
                                     取消
                                 </button>
                             </div>
@@ -1237,6 +1252,112 @@
             const modal = document.getElementById('registrationModal');
             if (modal) {
                 modal.remove();
+            }
+        }
+        
+        // 顯示新聞模態框
+        function showNewsModal(title, date, description, category) {
+            // 移除現有的模態框
+            const existingModal = document.querySelector('.news-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            const modal = document.createElement('div');
+            modal.className = 'news-modal';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-labelledby', 'news-modal-title');
+            modal.setAttribute('aria-describedby', 'news-modal-description');
+            modal.innerHTML = `
+                <div class="news-modal-content">
+                    <button class="news-modal-close" onclick="closeNewsModal()" aria-label="關閉模態框" tabindex="0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    <div class="mb-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-actc-orange text-white">
+                            ${category}
+                        </span>
+                    </div>
+                    <h2 id="news-modal-title" class="text-2xl font-bold text-gray-800 mb-3">${title}</h2>
+                    <div class="flex items-center text-sm text-gray-600 mb-4">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>${date}</span>
+                    </div>
+                    <div id="news-modal-description" class="text-gray-700 leading-relaxed">
+                        ${description}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // 顯示動畫
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+            
+            // 點擊背景關閉
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeNewsModal();
+                }
+            });
+            
+            // 鍵盤導航支援
+            const closeButton = modal.querySelector('.news-modal-close');
+            const firstFocusableElement = closeButton;
+            const lastFocusableElement = closeButton;
+            
+            // ESC鍵關閉
+            const handleKeydown = (e) => {
+                if (e.key === 'Escape') {
+                    closeNewsModal();
+                }
+                
+                // Tab鍵循環焦點
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusableElement) {
+                            e.preventDefault();
+                            lastFocusableElement.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusableElement) {
+                            e.preventDefault();
+                            firstFocusableElement.focus();
+                        }
+                    }
+                }
+            };
+            
+            document.addEventListener('keydown', handleKeydown);
+            
+            // 聚焦到關閉按鈕
+            setTimeout(() => {
+                closeButton.focus();
+            }, 100);
+            
+            // 清理事件監聽器
+            modal.addEventListener('close', () => {
+                document.removeEventListener('keydown', handleKeydown);
+            });
+        }
+        
+        // 關閉新聞模態框
+        function closeNewsModal() {
+            const modal = document.querySelector('.news-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                // 觸發關閉事件以清理事件監聽器
+                modal.dispatchEvent(new Event('close'));
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
             }
         }
         

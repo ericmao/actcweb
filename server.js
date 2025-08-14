@@ -195,25 +195,52 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/actc_websit
                     title: '資訊安全認證培訓課程',
                     type: 'course',
                     description: '為期8週的專業認證課程，涵蓋網路安全、密碼學、風險管理等核心領域。適合想要進入資訊安全領域的專業人士。',
+                    shortDescription: '專業認證課程，涵蓋網路安全、密碼學、風險管理等核心領域',
                     date: new Date('2025-09-15T09:00:00'),
                     location: '105台北市松山區復興北路57號',
-                    link: ''
+                    link: '',
+                    status: 'published',
+                    instructor: {
+                        name: '陳志明',
+                        title: '資安顧問',
+                        company: '資安科技公司'
+                    },
+                    capacity: 30,
+                    price: { isFree: true }
                 },
                 {
                     title: '駭客馬拉松競賽',
                     type: 'meetup',
                     description: '24小時不間斷的資安競賽，挑戰參賽者的技術能力與創新思維。歡迎各領域專家組隊參加。',
+                    shortDescription: '24小時不間斷的資安競賽，挑戰技術能力與創新思維',
                     date: new Date('2025-10-20T08:00:00'),
                     location: '新北市板橋區文化路一段188號',
-                    link: 'https://discord.gg/actc-hackathon'
+                    link: 'https://discord.gg/actc-hackathon',
+                    status: 'registration_open',
+                    instructor: {
+                        name: '李美華',
+                        title: '競賽總監',
+                        company: 'ACTC協會'
+                    },
+                    capacity: 100,
+                    price: { isFree: true }
                 },
                 {
                     title: '資安實務工作坊',
                     type: 'workshop',
                     description: '實作導向的資安技能培訓，讓學員在真實環境中學習防護技術。包含滲透測試、惡意軟體分析等主題。',
+                    shortDescription: '實作導向的資安技能培訓，包含滲透測試、惡意軟體分析等主題',
                     date: new Date('2025-11-10T13:00:00'),
                     location: '高雄市前金區中正四路211號',
-                    link: 'https://teams.microsoft.com/l/meetup-join/19%3ameeting_actc'
+                    link: 'https://teams.microsoft.com/l/meetup-join/19%3ameeting_actc',
+                    status: 'published',
+                    instructor: {
+                        name: '王建國',
+                        title: '資安講師',
+                        company: '高雄科技大學'
+                    },
+                    capacity: 25,
+                    price: { isFree: false, amount: 1500, currency: 'TWD' }
                 }
             ];
             
