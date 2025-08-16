@@ -24,19 +24,32 @@
                 </div>
                 <div class="hidden md:flex space-x-8">
                     <a href="index.html" class="text-gray-600 hover:text-actc-orange transition-colors">首頁</a>
-                    <a href="index.html#board" class="text-gray-600 hover:text-actc-orange transition-colors">理監事</a>
+                    <a href="about.html" class="text-gray-600 hover:text-actc-orange transition-colors">關於協會</a>
                     <a href="index.html#news" class="text-gray-600 hover:text-actc-orange transition-colors">最新消息</a>
                     <a href="index.html#events" class="text-gray-600 hover:text-actc-orange transition-colors">活動課程</a>
                     <a href="index.html#corporate-members" class="text-gray-600 hover:text-actc-orange transition-colors">企業會員</a>
                     <a href="workgroups.html" class="text-actc-orange font-semibold">工作小組</a>
                 </div>
                 <div class="md:hidden">
-                    <button class="text-gray-600 hover:text-actc-orange">
+                    <button id="mobileMenuBtn" class="text-gray-600 hover:text-actc-orange">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
                 </div>
+            </div>
+            
+            <!-- 手機選單 -->
+            <div id="mobileMenu" class="hidden md:hidden pb-4">
+                <div class="space-y-2">
+                    <a href="index.html" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">首頁</a>
+                    <a href="about.html" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">關於協會</a>
+                    <a href="index.html#news" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">最新消息</a>
+                    <a href="index.html#events" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">活動課程</a>
+                    <a href="index.html#corporate-members" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">企業會員</a>
+                    <a href="workgroups.html" class="block text-actc-orange font-semibold py-2">工作小組</a>
+                </div>
+            </div>
             </div>
         </div>
     </nav>
@@ -73,7 +86,7 @@
                     
                     <div class="space-y-4">
                         <div class="bg-white rounded-lg p-4 border-l-4 border-actc-orange">
-                            <h4 class="font-semibold text-gray-800 mb-2">召集人</h4>
+                            <h4 class="font-semibold text-gray-800 mb-2">工作小組</h4>
                             <div class="space-y-2">
                                 <p class="text-gray-700">王耀華 - 啟碁科技資深技術經理</p>
                                 <p class="text-gray-700">賴俊銘 - 東海大學副教授</p>
@@ -100,10 +113,11 @@
                     
                     <div class="space-y-4">
                         <div class="bg-white rounded-lg p-4 border-l-4 border-actc-orange">
-                            <h4 class="font-semibold text-gray-800 mb-2">召集人</h4>
+                            <h4 class="font-semibold text-gray-800 mb-2">工作小組</h4>
                             <div class="space-y-2">
                                 <p class="text-gray-700">蕭孟軒 - 和雲行動服務總監</p>
                                 <p class="text-gray-700">楊順清 - 與世同行有限公司董事長</p>
+                                <p class="text-gray-700">曾文德 - 資深顧問</p>
                             </div>
                         </div>
                         
@@ -181,10 +195,10 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">快速連結</h3>
                     <div class="space-y-2">
-                        <a href="index.html#about" class="block text-gray-300 hover:text-actc-orange transition-colors">協會宗旨</a>
-                        <a href="index.html#board" class="block text-gray-300 hover:text-actc-orange transition-colors">理監事</a>
+                        <a href="about.html" class="block text-gray-300 hover:text-actc-orange transition-colors">協會宗旨</a>
+                        <a href="about.html#board" class="block text-gray-300 hover:text-actc-orange transition-colors">理監事</a>
                         <a href="index.html#news" class="block text-gray-300 hover:text-actc-orange transition-colors">最新消息</a>
-                        <a href="index.html#courses" class="block text-gray-300 hover:text-actc-orange transition-colors">活動課程</a>
+                        <a href="index.html#events" class="block text-gray-300 hover:text-actc-orange transition-colors">活動課程</a>
                         <a href="about.html" class="block text-gray-300 hover:text-actc-orange transition-colors">關於我們</a>
                         <a href="workgroups.html" class="block text-actc-orange font-semibold">工作小組</a>
                     </div>
@@ -210,6 +224,18 @@
                     });
                 }
             });
+        });
+        
+        // 手機選單功能
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
         });
     </script>
 </body>

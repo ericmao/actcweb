@@ -34,12 +34,25 @@
                     <a href="workgroups.html" class="nav-link text-gray-600 hover:text-actc-orange transition-colors focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">工作小組</a>
                 </div>
                 <div class="md:hidden">
-                    <button class="text-gray-600 hover:text-actc-orange focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">
+                    <button id="mobileMenuBtn" class="text-gray-600 hover:text-actc-orange focus:outline-none focus:ring-2 focus:ring-actc-sand focus:ring-offset-2 rounded">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
                 </div>
+            </div>
+            
+            <!-- 手機選單 -->
+            <div id="mobileMenu" class="hidden md:hidden pb-4">
+                <div class="space-y-2">
+                    <a href="#home" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">首頁</a>
+                    <a href="about.html" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">關於協會</a>
+                    <a href="#news" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">最新消息</a>
+                    <a href="#events" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">活動課程</a>
+                    <a href="#corporate-members" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">企業會員</a>
+                    <a href="workgroups.html" class="block text-gray-600 hover:text-actc-orange transition-colors py-2">工作小組</a>
+                </div>
+            </div>
             </div>
         </div>
     </nav>
@@ -120,6 +133,8 @@
             </div>
         </div>
     </section>
+
+
 
     <!-- 活動課程 -->
     <section id="events" class="py-20 bg-gray-50 fade-in">
@@ -398,8 +413,9 @@
             }
 
             createNewsCard(news) {
-                const images = news.images && news.images.length > 0 ? news.images : [];
-                const hasImages = images.length > 0;
+                // 優先使用 imageUrl，然後是 images 陣列
+                const imageUrl = news.imageUrl || (news.images && news.images.length > 0 ? news.images[0] : '');
+                const hasImage = imageUrl && imageUrl.trim() !== '';
                 const hasFile = news.file;
                 const hasLink = news.link;
                 const newsDate = news.date ? new Date(news.date) : new Date();
@@ -407,25 +423,20 @@
                 
                 return `
                     <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" 
-                         onclick="showNewsModal('${news.title}', '${newsDate.toLocaleDateString('zh-TW')}', '${news.description.replace(/'/g, "\\'")}', '${news.category || '一般'}')"
+                         onclick="showNewsModal('${news.title}', '${newsDate.toLocaleDateString('zh-TW')}', '${(news.description || '').replace(/'/g, "\\'")}', '${news.category || '一般'}')"
                          role="button"
                          tabindex="0"
                          aria-label="點擊查看 ${news.title} 的詳細資訊"
-                         onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); showNewsModal('${news.title}', '${newsDate.toLocaleDateString('zh-TW')}', '${news.description.replace(/'/g, "\\'")}', '${news.category || '一般'}') }">
-                        ${hasImages ? `
-                            <div class="swiper-container h-48 relative">
-                                <div class="swiper-wrapper">
-                                    ${images.map(img => `
-                                        <div class="swiper-slide">
-                                            <img src="${img.startsWith('/') ? img : '/' + img}" alt="${news.title}" class="w-full h-full object-cover" loading="lazy" onerror="this.style.display='none'">
-                                        </div>
-                                    `).join('')}
+                         onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); showNewsModal('${news.title}', '${newsDate.toLocaleDateString('zh-TW')}', '${(news.description || '').replace(/'/g, "\\'")}', '${news.category || '一般'}') }">
+                        ${hasImage ? `
+                            <div class="h-48 relative">
+                                <img src="${imageUrl}" alt="${news.title}" class="w-full h-full object-cover" loading="lazy" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="w-full h-full bg-gradient-to-br from-actc-orange to-actc-orange-dark flex items-center justify-center relative hover:opacity-90 transition-opacity" style="display: none;">
+                                    <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
                                 </div>
-                                ${images.length > 1 ? `
-                                    <div class="swiper-pagination"></div>
-                                    <div class="swiper-button-next"></div>
-                                    <div class="swiper-button-prev"></div>
-                                ` : ''}
                                 <!-- 分類標籤 -->
                                 <div class="absolute top-3 left-3">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-actc-orange text-white shadow-lg">
@@ -453,7 +464,7 @@
                                 <span class="text-sm text-actc-orange font-medium whitespace-nowrap ml-2">${newsDate.toLocaleDateString('zh-TW')}</span>
                             </div>
                             
-                            <p class="text-gray-600 mb-4 line-clamp-3 leading-relaxed">${news.description}</p>
+                            <p class="text-gray-600 mb-4 line-clamp-3 leading-relaxed">${news.description || news.content || ''}</p>
                             
                             <div class="space-y-2">
                                 ${hasFile ? `
@@ -1147,6 +1158,16 @@
             new NewsManager();
             new HomeMembersManager();
             new HomeEventsManager();
+            
+            // 手機選單功能
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
         });
 
         // 活動報名功能
@@ -1390,6 +1411,9 @@
                 }, 300);
             }, 3000);
         }
+
+
+
     </script>
 </body>
 </html>
